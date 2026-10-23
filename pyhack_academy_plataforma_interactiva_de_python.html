@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>PyHack Academy | Aprende Python Gamificado</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#21262d',
+                            neon: '#00ff66',
+                            neonDim: 'rgba(0, 255, 102, 0.15)',
+                            purple: '#8a2be2',
+                            purpleLight: '#a855f7',
+                            purpleDim: 'rgba(138, 43, 226, 0.18)',
+                            amber: '#ffb800',
+                            danger: '#ff3b5c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    boxShadow: {
+                        'neon': '0 0 18px rgba(0, 255, 102, 0.35)',
+                        'neon-sm': '0 0 10px rgba(0, 255, 102, 0.25)',
+                        'purple': '0 0 18px rgba(138, 43, 226, 0.45)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+
+        body {
+            background-color: #0d1117;
+            color: #e6edf3;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Fondo de cuadrícula Cyberpunk sutil */
+        .cyber-grid-bg {
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(138, 43, 226, 0.08) 0%, transparent 35%),
+                radial-gradient(circle at 85% 80%, rgba(0, 255, 102, 0.07) 0%, transparent 40%),
+                linear-gradient(to right, rgba(33, 38, 45, 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(33, 38, 45, 0.35) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+        }
+
+        /* Scrollbars personalizadas */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff66;
+        }
+
+        /* Animación de llama parpadeante para la racha */
+        @keyframes flamePulse {
+            0%, 100% {
+                transform: scale(1) rotate(-2deg);
+                filter: drop-shadow(0 0 8px rgba(255, 140, 0, 0.9));
+            }
+            50% {
+                transform: scale(1.18) rotate(3deg);
+                filter: drop-shadow(0 0 14px rgba(255, 69, 0, 1));
+            }
+        }
+        .flame-active {
+            animation: flamePulse 1.4s infinite ease-in-out;
+        }
+
+        /* Animación de pulso neón para nodos activos */
+        @keyframes nodeGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.5), 0 0 15px rgba(0, 255, 102, 0.35);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(0, 255, 102, 0), 0 0 25px rgba(0, 255, 102, 0.65);
+            }
+        }
+        .node-current {
+            animation: nodeGlow 2.2s infinite ease-in-out;
+        }
+
+        /* Transición suave de pestañas */
+        .tab-view {
+            animation: fadeInView 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeInView {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Flotador de +XP */
+        @keyframes floatUpFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.9);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-48px) scale(1.1);
+            }
+        }
+        .xp-floater {
+            animation: floatUpFade 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Editor de código con números de línea */
+        .code-editor-wrapper {
+            display: flex;
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5rem;
+        }
+        .line-numbers {
+            user-select: none;
+            text-align: right;
+            padding: 1rem 0.75rem;
+            background-color: #090d11;
+            color: #484f58;
+            border-right: 1px solid #21262d;
+            min-width: 3rem;
+        }
+        .code-textarea {
+            flex: 1;
+            background-color: #0b0f14;
+            color: #00ff66;
+            padding: 1rem;
+            border: none;
+            outline: none;
+            resize: none;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5rem;
+            caret-color: #00ff66;
+        }
+
+        /* Conector de árbol de habilidades */
+        .roadmap-line {
+            background: linear-gradient(180deg, #00ff66 0%, #8a2be2 100%);
+        }
+    </style>
+</head>
+<body class="cyber-grid-bg min-h-screen flex flex-col md:flex-row selection:bg-cyber-neon selection:text-black">
+
+    <!-- CONTENEDOR DE NOTIFICACIONES FLOTANTES (TOASTS & XP FLOATERS) -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 md:px-0"></div>
+
+    <!-- ==========================================
+         SIDEBAR DE NAVEGACIÓN (ESCRITORIO)
+         ========================================== -->
+    <aside class="hidden md:flex flex-col w-64 lg:w-72 bg-cyber-card/95 backdrop-blur-md border-r border-cyber-border shrink-0 sticky top-0 h-screen z-30 justify-between">
+        <div>
+            <!-- Logo de la Plataforma -->
+            <div class="p-6 flex items-center gap-3 border-b border-cyber-border">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyber-neon to-cyber-purple p-[2px] shadow-neon-sm">
+                    <div class="w-full h-full bg-cyber-bg rounded-[10px] flex items-center justify-center">
+                        <i class="fa-brands fa-python text-2xl text-cyber-neon"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-black text-lg tracking-wider text-white">PY<span class="text-cyber-neon">HACK</span></span>
+                        <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-cyber-purpleDim text-cyber-purpleLight border border-cyber-purple/40">v2.5</span>
+                    </div>
+                    <p class="text-xs text-gray-400 font-mono">University Edition</p>
+                </div>
+            </div>
+
+            <!-- Menú Principal -->
+            <nav class="p-4 space-y-2" aria-label="Navegación Principal">
+                <button onclick="switchView('roadmap')" data-nav="roadmap" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200">
+                    <i class="fa-solid fa-sitemap text-lg w-6 text-center"></i>
+                    <span>Ruta Universitaria</span>
+                </button>
+
+                <button onclick="switchView('challenges')" data-nav="challenges" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200">
+                    <div class="flex items-center gap-3.5">
+                        <i class="fa-solid fa-terminal text-lg w-6 text-center"></i>
+                        <span>Retos del Día</span>
+                    </div>
+                    <span class="text-[10px] font-mono bg-cyber-neon/20 text-cyber-neon border border-cyber-neon/40 px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                </button>
+
+                <button onclick="switchView('leaderboard')" data-nav="leaderboard" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200">
+                    <i class="fa-solid fa-trophy text-lg w-6 text-center"></i>
+                    <span>Liga Universitaria</span>
+                </button>
+
+                <button onclick="switchView('achievements')" data-nav="achievements" class="nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200">
+                    <div class="flex items-center gap-3.5">
+                        <i class="fa-solid fa-medal text-lg w-6 text-center"></i>
+                        <span>Logros y Perfil</span>
+                    </div>
+                    <span id="sidebar-badge-count" class="text-xs font-mono bg-cyber-border text-gray-300 px-2 py-0.5 rounded-full">0/8</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tarjeta Resumen del Estudiante en Sidebar -->
+        <div class="p-4 m-4 rounded-2xl bg-cyber-bg/90 border border-cyber-border space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-mono text-gray-400 uppercase">Estado del Sistema</span>
+                <span class="inline-flex items-center gap-1 text-xs font-mono text-cyber-neon">
+                    <span class="w-2 h-2 rounded-full bg-cyber-neon animate-ping"></span> Online
+                </span>
+            </div>
+            <div class="text-xs text-gray-300 space-y-1.5 font-mono">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Módulos superados:</span>
+                    <span id="sidebar-modules-done" class="text-white font-bold">0/12</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Retos resueltos:</span>
+                    <span id="sidebar-challenges-done" class="text-cyber-neon font-bold">0/3</span>
+                </div>
+            </div>
+            <div class="pt-2 border-t border-cyber-border flex items-center justify-between gap-2">
+                <button onclick="toggleSound()" id="sound-toggle-btn" class="flex-1 py-1.5 px-2.5 rounded-lg bg-cyber-card hover:bg-cyber-border text-xs text-gray-300 font-mono flex items-center justify-center gap-1.5 transition">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-cyber-neon"></i>
+                    <span id="sound-label">SFX ON</span>
+                </button>
+                <button onclick="openResetModal()" title="Reiniciar Progreso" class="py-1.5 px-2.5 rounded-lg bg-cyber-card hover:bg-cyber-danger/20 hover:text-cyber-danger text-xs text-gray-400 transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==========================================
+         ÁREA PRINCIPAL DE CONTENIDO
+         ========================================== -->
+    <div class="flex-1 flex flex-col min-w-0 pb-24 md:pb-10">
+
+        <!-- ==========================================
+             PANEL DE ESTADO SUPERIOR (GAMIFICACIÓN)
+             ========================================== -->
+        <header class="sticky top-0 z-20 bg-cyber-bg/90 backdrop-blur-lg border-b border-cyber-border px-3 sm:px-6 py-3">
+            <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+
+                <!-- Logo Móvil + Rango Universitario -->
+                <div class="flex items-center gap-2.5 sm:gap-4">
+                    <!-- Mini icono solo en móvil -->
+                    <div class="md:hidden w-9 h-9 rounded-xl bg-gradient-to-br from-cyber-neon to-cyber-purple p-[1.5px] shrink-0">
+                        <div class="w-full h-full bg-cyber-bg rounded-[10px] flex items-center justify-center">
+                            <i class="fa-brands fa-python text-lg text-cyber-neon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Insignia de Rango Universitario -->
+                    <div onclick="switchView('achievements')" class="cursor-pointer group flex items-center gap-2.5 bg-cyber-card hover:border-cyber-purple transition px-3 py-1.5 rounded-xl border border-cyber-border">
+                        <div id="header-rank-icon" class="w-8 h-8 rounded-lg bg-cyber-purpleDim border border-cyber-purple/50 flex items-center justify-center text-cyber-purpleLight group-hover:scale-105 transition">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] font-mono uppercase tracking-wider text-gray-400">Rango Actual</span>
+                                <span id="header-level-pill" class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-cyber-neon/15 text-cyber-neon rounded">NV. 1</span>
+                            </div>
+                            <p id="header-rank-title" class="text-xs sm:text-sm font-extrabold text-white tracking-tight">Script Junior</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Progreso de XP Central -->
+                <div class="order-3 lg:order-2 w-full lg:w-72 xl:w-80 bg-cyber-card px-3.5 py-2 rounded-xl border border-cyber-border">
+                    <div class="flex justify-between items-center text-xs mb-1">
+                        <span class="font-mono text-gray-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt text-cyber-neon"></i> PROGRESO XP
+                        </span>
+                        <span class="font-mono font-bold text-white">
+                            <span id="header-xp-current" class="text-cyber-neon">0</span> / <span id="header-xp-next">200</span> XP
+                        </span>
+                    </div>
+                    <div class="w-full h-2.5 bg-cyber-bg rounded-full overflow-hidden p-0.5 border border-cyber-border">
+                        <div id="header-xp-bar" class="h-full rounded-full bg-gradient-to-r from-cyber-purple via-emerald-400 to-cyber-neon transition-all duration-500" style="width: 5%"></div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas Rápidas: Racha de Días y Monedas -->
+                <div class="order-2 lg:order-3 flex items-center gap-2 sm:gap-3">
+                    <!-- Racha de Días -->
+                    <button onclick="triggerStreakInfo()" class="flex items-center gap-2 bg-cyber-card hover:bg-cyber-border/70 px-3 py-2 rounded-xl border border-cyber-border transition" title="Racha de días activos">
+                        <i id="streak-fire-icon" class="fa-solid fa-fire-flame-curved text-orange-500 text-base sm:text-lg flame-active"></i>
+                        <div class="text-left">
+                            <span id="header-streak-count" class="font-mono font-extrabold text-xs sm:text-sm text-white block leading-none">1</span>
+                            <span class="text-[10px] text-gray-400 font-mono hidden sm:inline">Días Racha</span>
+                        </div>
+                    </button>
+
+                    <!-- Monedas / Puntos Virtuales -->
+                    <div class="flex items-center gap-2 bg-cyber-card px-3 py-2 rounded-xl border border-cyber-border" title="PyCoins acumulados">
+                        <i class="fa-solid fa-coins text-cyber-amber text-base sm:text-lg"></i>
+                        <div class="text-left">
+                            <span id="header-coins-count" class="font-mono font-extrabold text-xs sm:text-sm text-cyber-amber block leading-none">50</span>
+                            <span class="text-[10px] text-gray-400 font-mono hidden sm:inline">PyCoins</span>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Sonido en Móvil -->
+                    <button onclick="toggleSound()" class="md:hidden w-9 h-9 rounded-xl bg-cyber-card border border-cyber-border flex items-center justify-center text-cyber-neon">
+                        <i id="sound-icon-mobile" class="fa-solid fa-volume-high text-sm"></i>
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ==========================================
+             CONTENEDOR DE VISTAS DINÁMICAS
+             ========================================== -->
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6">
+
+            <!-- ==========================================
+                 VISTA 1: RUTA DE APRENDIZAJE UNIVERSITARIA
+                 ========================================== -->
+            <section id="view-roadmap" class="tab-view space-y-8">
+                <!-- Banner Hero de la Ruta -->
+                <div class="relative rounded-2xl bg-gradient-to-r from-cyber-card via-[#1c162e] to-cyber-card border border-cyber-border p-5 sm:p-7 overflow-hidden">
+                    <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+                        <i class="fa-brands fa-python text-9xl text-cyber-neon"></i>
+                    </div>
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-2 max-w-2xl">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-neonDim border border-cyber-neon/30 text-cyber-neon text-xs font-mono">
+                                <i class="fa-solid fa-graduation-cap"></i> PLAN DE ESTUDIOS INTERACTIVO
+                            </div>
+                            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                Árbol de Habilidades <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-neon to-cyber-purpleLight">Python Universitario</span>
+                            </h1>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Completa cada módulo estudiando la cápsula teórica y superando el examen técnico de 3 preguntas. Cada respuesta correcta otorga <span class="text-cyber-neon font-mono font-bold">+50 XP</span> y <span class="text-cyber-amber font-mono font-bold">+10 PyCoins</span>.
+                            </p>
+                        </div>
+
+                        <!-- Selector Modo Secuencial / Modo Libre -->
+                        <div class="bg-cyber-bg/90 p-3.5 rounded-xl border border-cyber-border shrink-0 flex flex-col gap-2">
+                            <span class="text-[11px] font-mono text-gray-400 uppercase">Modo de Desbloqueo</span>
+                            <button onclick="toggleUnlockMode()" id="unlock-mode-btn" class="px-3.5 py-2 rounded-lg text-xs font-mono font-bold border transition flex items-center justify-between gap-3 bg-cyber-neonDim border-cyber-neon text-cyber-neon">
+                                <span id="unlock-mode-text"><i class="fa-solid fa-unlock-keyhole mr-1.5"></i>Acceso Libre Activo</span>
+                                <i class="fa-solid fa-sliders"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenedor del Árbol de Habilidades (Renderizado por JS en 3 Niveles) -->
+                <div id="roadmap-tiers-container" class="space-y-10"></div>
+            </section>
+
+            <!-- ==========================================
+                 VISTA 2: RETOS DIARIOS CON CRONÓMETRO (HACKFY)
+                 ========================================== -->
+            <section id="view-challenges" class="tab-view hidden space-y-6">
+                <!-- Encabezado con Cronómetro en Vivo -->
+                <div class="rounded-2xl bg-cyber-card border border-cyber-border p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="space-y-1.5">
+                        <div class="inline-flex items-center gap-2 text-xs font-mono text-cyber-purpleLight bg-cyber-purpleDim border border-cyber-purple/40 px-3 py-1 rounded-full">
+                            <i class="fa-solid fa-bug-slash"></i> LABORATORIO HACKFY DE CÓDIGO EN VIVO
+                        </div>
+                        <h2 class="text-2xl font-black text-white">Retos Técnicos del Día</h2>
+                        <p class="text-sm text-gray-400">
+                            Resuelve bugs reales en la terminal antes de que reinicie el servidor diario. Recompensa especial: <span class="text-cyber-neon font-mono font-bold">+150 XP</span> y <span class="text-cyber-amber font-mono font-bold">+35 PyCoins</span> por reto.
+                        </p>
+                    </div>
+
+                    <!-- Cronómetro de Cuenta Regresiva -->
+                    <div class="bg-cyber-bg border border-cyber-border rounded-2xl p-4 flex items-center gap-4 shrink-0 self-start lg:self-center">
+                        <div class="w-11 h-11 rounded-xl bg-cyber-danger/15 border border-cyber-danger/40 flex items-center justify-center text-cyber-danger text-xl animate-pulse">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-mono uppercase text-gray-400 block">El reto expira en:</span>
+                            <div id="daily-countdown" class="font-mono text-xl sm:text-2xl font-black text-white tracking-wider">
+                                08:42:19
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selector de Retos Diarios (3 Retos) -->
+                <div id="daily-challenges-tabs" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+
+                <!-- Área de Trabajo: Enunciado + Editor de Código + Consola -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Panel Izquierdo: Especificación del Reto -->
+                    <div class="lg:col-span-5 bg-cyber-card border border-cyber-border rounded-2xl p-5 flex flex-col justify-between space-y-5">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between gap-2">
+                                <span id="challenge-difficulty-badge" class="text-xs font-mono px-2.5 py-1 rounded-md bg-cyber-neonDim text-cyber-neon border border-cyber-neon/30">
+                                    Dificultad: Fácil
+                                </span>
+                                <span id="challenge-status-badge" class="text-xs font-mono text-gray-400">
+                                    <i class="fa-regular fa-circle-dot mr-1"></i>Pendiente
+                                </span>
+                            </div>
+
+                            <h3 id="challenge-title" class="text-xl font-extrabold text-white">Cargando reto...</h3>
+                            <p id="challenge-desc" class="text-sm text-gray-300 leading-relaxed"></p>
+
+                            <!-- Bloque de Objetivo Técnico -->
+                            <div class="bg-cyber-bg rounded-xl p-4 border border-cyber-border space-y-2">
+                                <div class="text-xs font-mono text-cyber-purpleLight uppercase font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-crosshairs"></i> Criterio de Aceptación (Unit Test)
+                                </div>
+                                <p id="challenge-goal" class="text-xs font-mono text-gray-300 leading-relaxed"></p>
+                            </div>
+
+                            <!-- Caja de Pista Desbloqueable -->
+                            <div id="challenge-hint-box" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 text-xs text-amber-200 font-mono space-y-1">
+                                <div class="font-bold text-cyber-amber flex items-center gap-1.5">
+                                    <i class="fa-solid fa-lightbulb"></i> Pista del Mentor:
+                                </div>
+                                <p id="challenge-hint-text"></p>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Ayuda -->
+                        <div class="pt-4 border-t border-cyber-border flex flex-wrap items-center justify-between gap-2">
+                            <button onclick="showChallengeHint()" class="text-xs font-mono px-3 py-2 rounded-lg bg-cyber-bg hover:bg-cyber-border text-cyber-amber border border-cyber-border transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Ver Pista
+                            </button>
+                            <button onclick="fillChallengeSolution()" class="text-xs font-mono px-3 py-2 rounded-lg bg-cyber-purpleDim hover:bg-cyber-purple/30 text-cyber-purpleLight border border-cyber-purple/40 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-bolt"></i> Auto-completar Solución
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Panel Derecho: Editor Numerado + Terminal de Salida -->
+                    <div class="lg:col-span-7 flex flex-col gap-4">
+                        <!-- Ventana del Editor -->
+                        <div class="bg-cyber-card border border-cyber-border rounded-2xl overflow-hidden flex flex-col shadow-lg">
+                            <!-- Barra superior de la ventana del editor -->
+                            <div class="bg-[#090d11] px-4 py-2.5 border-b border-cyber-border flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+                                    <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+                                    <span id="editor-filename" class="ml-2 text-xs font-mono text-gray-400">solution.py — Python 3.12</span>
+                                </div>
+                                <button onclick="resetChallengeCode()" class="text-xs font-mono text-gray-400 hover:text-white transition flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate-left"></i> Restaurar código
+                                </button>
+                            </div>
+
+                            <!-- Textarea con líneas numeradas -->
+                            <div class="code-editor-wrapper min-h-[210px]">
+                                <div id="editor-line-numbers" class="line-numbers">1<br>2<br>3<br>4<br>5</div>
+                                <textarea id="challenge-code-editor" class="code-textarea" rows="8" spellcheck="false" oninput="updateLineNumbers()" onkeydown="handleEditorTab(event)"></textarea>
+                            </div>
+
+                            <!-- Barra de Acción del Editor -->
+                            <div class="bg-cyber-card px-4 py-3 border-t border-cyber-border flex flex-wrap items-center justify-between gap-3">
+                                <span class="text-[11px] font-mono text-gray-400">
+                                    <i class="fa-solid fa-keyboard mr-1 text-cyber-neon"></i>Soporta indentación con tecla Tab
+                                </span>
+                                <button id="submit-challenge-btn" onclick="submitDailyChallenge()" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-cyber-neon text-black hover:brightness-110 active:scale-95 transition shadow-neon-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-play"></i> Enviar Solución
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Consola / Terminal Simulada -->
+                        <div class="bg-[#070a0e] border border-cyber-border rounded-2xl p-4 font-mono text-xs space-y-2 min-h-[140px] flex flex-col justify-between">
+                            <div class="flex items-center justify-between border-b border-cyber-border pb-2 text-gray-400">
+                                <span><i class="fa-solid fa-terminal text-cyber-neon mr-1.5"></i>PYHACK SANDBOX TERMINAL</span>
+                                <span id="terminal-status-indicator" class="text-[10px] px-2 py-0.5 rounded bg-cyber-border text-gray-300">IDLE</span>
+                            </div>
+                            <div id="terminal-output" class="space-y-1.5 text-gray-300 py-2 overflow-y-auto max-h-40">
+                                <p class="text-gray-500">$ Esperando envío de solución para ejecutar suite de pruebas PyTest...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================
+                 VISTA 3: LIGA UNIVERSITARIA (RANKING)
+                 ========================================== -->
+            <section id="view-leaderboard" class="tab-view hidden space-y-6">
+                <!-- Banner de la Liga -->
+                <div class="rounded-2xl bg-gradient-to-r from-[#1a1333] via-cyber-card to-[#0f291e] border border-cyber-border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="space-y-1.5">
+                        <div class="inline-flex items-center gap-2 text-xs font-mono text-cyber-neon bg-cyber-neonDim border border-cyber-neon/30 px-3 py-1 rounded-full">
+                            <i class="fa-solid fa-ranking-star"></i> TEMPORADA UNIVERSITARIA #04
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">Liga Universitaria CyberPython</h2>
+                        <p class="text-sm text-gray-300 max-w-xl">
+                            Compite en tiempo real contra otros estudiantes de ingeniería. Cada módulo y reto diario que superas actualiza tu posición en la tabla automáticamente.
+                        </p>
+                    </div>
+
+                    <!-- Personalizar Alias del Estudiante -->
+                    <div class="bg-cyber-bg/90 p-3.5 rounded-xl border border-cyber-border w-full md:w-auto flex items-center gap-2">
+                        <div class="flex-1">
+                            <label for="student-alias-input" class="text-[10px] font-mono uppercase text-gray-400 block">Tu Alias de Hacker</label>
+                            <input id="student-alias-input" type="text" maxlength="18" class="bg-transparent text-sm font-bold text-white focus:outline-none border-b border-transparent focus:border-cyber-neon w-full font-mono" value="CyberStudent_PY">
+                        </div>
+                        <button onclick="saveStudentAlias()" class="px-3 py-2 rounded-lg bg-cyber-neon text-black font-bold text-xs hover:brightness-110 transition">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Podio Top 3 + Lista Completa -->
+                <div id="leaderboard-podium" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+
+                <div class="bg-cyber-card border border-cyber-border rounded-2xl overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-cyber-border flex items-center justify-between text-xs font-mono text-gray-400 uppercase">
+                        <span>Posición / Estudiante</span>
+                        <span>Rango / Puntuación XP</span>
+                    </div>
+                    <div id="leaderboard-rows" class="divide-y divide-cyber-border"></div>
+                </div>
+            </section>
+
+            <!-- ==========================================
+                 VISTA 4: LOGROS Y PERFIL UNIVERSITARIO
+                 ========================================== -->
+            <section id="view-achievements" class="tab-view hidden space-y-8">
+                <!-- Tarjeta de Perfil y Escalafón de Rangos -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Resumen de Perfil -->
+                    <div class="lg:col-span-5 bg-cyber-card border border-cyber-border rounded-2xl p-6 flex flex-col justify-between space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyber-neon to-cyber-purple p-[2px] shadow-neon-sm">
+                                <div class="w-full h-full bg-cyber-bg rounded-[14px] flex items-center justify-center text-2xl text-cyber-neon">
+                                    <i class="fa-solid fa-user-ninja"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <span id="profile-rank-badge" class="text-xs font-mono px-2.5 py-0.5 rounded bg-cyber-purpleDim text-cyber-purpleLight border border-cyber-purple/40">
+                                    Script Junior
+                                </span>
+                                <h2 id="profile-username" class="text-2xl font-black text-white mt-1">CyberStudent_PY</h2>
+                                <p class="text-xs font-mono text-gray-400">Ingeniería de Software & Python</p>
+                            </div>
+                        </div>
+
+                        <!-- Cuadrícula de Estadísticas -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-cyber-bg p-3.5 rounded-xl border border-cyber-border">
+                                <span class="text-xs text-gray-400 font-mono block">Experiencia Total</span>
+                                <span id="profile-stat-xp" class="text-xl font-black text-cyber-neon font-mono">0 XP</span>
+                            </div>
+                            <div class="bg-cyber-bg p-3.5 rounded-xl border border-cyber-border">
+                                <span class="text-xs text-gray-400 font-mono block">Billetera Virtual</span>
+                                <span id="profile-stat-coins" class="text-xl font-black text-cyber-amber font-mono">50 PyCoins</span>
+                            </div>
+                            <div class="bg-cyber-bg p-3.5 rounded-xl border border-cyber-border">
+                                <span class="text-xs text-gray-400 font-mono block">Lecciones Aprobadas</span>
+                                <span id="profile-stat-lessons" class="text-xl font-black text-white font-mono">0 / 12</span>
+                            </div>
+                            <div class="bg-cyber-bg p-3.5 rounded-xl border border-cyber-border">
+                                <span class="text-xs text-gray-400 font-mono block">Medallas Desbloqueadas</span>
+                                <span id="profile-stat-badges" class="text-xl font-black text-cyber-purpleLight font-mono">0 / 8</span>
+                            </div>
+                        </div>
+
+                        <!-- Acciones de Demostración y Reset -->
+                        <div class="pt-4 border-t border-cyber-border flex flex-wrap items-center justify-between gap-2">
+                            <button onclick="grantDemoBoost()" class="text-xs font-mono px-3.5 py-2 rounded-xl bg-cyber-neonDim hover:bg-cyber-neon/25 text-cyber-neon border border-cyber-neon/40 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-flask"></i> Simular +100 XP (Demo)
+                            </button>
+                            <button onclick="openResetModal()" class="text-xs font-mono px-3.5 py-2 rounded-xl bg-cyber-danger/10 hover:bg-cyber-danger/20 text-cyber-danger border border-cyber-danger/30 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Reiniciar Datos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Escalafón de Rangos Universitarios -->
+                    <div class="lg:col-span-7 bg-cyber-card border border-cyber-border rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-extrabold text-white">Escalafón de Rangos Universitarios</h3>
+                                <p class="text-xs text-gray-400">Acumula XP en lecciones y retos diarios para ascender hasta Python Master.</p>
+                            </div>
+                            <i class="fa-solid fa-layer-group text-cyber-purpleLight text-xl"></i>
+                        </div>
+                        <div id="ranks-progression-list" class="space-y-2.5"></div>
+                    </div>
+                </div>
+
+                <!-- Rejilla de Medallas y Logros -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-black text-white">Bóveda de Medallas y Logros</h3>
+                            <p class="text-sm text-gray-400">Las medallas se desbloquean automáticamente al cumplir hitos en la plataforma.</p>
+                        </div>
+                    </div>
+                    <div id="achievements-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ==========================================
+         BARRA DE NAVEGACIÓN INFERIOR (ANDROID / MÓVIL PWA)
+         ========================================== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-cyber-card/95 backdrop-blur-xl border-t border-cyber-border px-2 py-1.5 flex items-center justify-around shadow-2xl" aria-label="Navegación Móvil">
+        <button onclick="switchView('roadmap')" data-nav-mobile="roadmap" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all">
+            <i class="fa-solid fa-sitemap text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">Ruta</span>
+        </button>
+
+        <button onclick="switchView('challenges')" data-nav-mobile="challenges" class="mobile-nav-btn relative flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all">
+            <span class="absolute top-1 right-2.5 w-2 h-2 rounded-full bg-cyber-neon animate-ping"></span>
+            <i class="fa-solid fa-terminal text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">Retos</span>
+        </button>
+
+        <button onclick="switchView('leaderboard')" data-nav-mobile="leaderboard" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all">
+            <i class="fa-solid fa-trophy text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">Liga</span>
+        </button>
+
+        <button onclick="switchView('achievements')" data-nav-mobile="achievements" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-all">
+            <i class="fa-solid fa-medal text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">Logros</span>
+        </button>
+    </nav>
+
+    <!-- ==========================================
+         MODAL DE LECCIÓN INTERACTIVA Y EXAMEN
+         ========================================== -->
+    <div id="lesson-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl my-auto animate-[fadeInView_0.25s_ease-out]">
+            <!-- Cabecera del Modal -->
+            <div class="bg-[#0b0f14] px-5 py-4 border-b border-cyber-border flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div id="modal-module-icon" class="w-10 h-10 rounded-xl bg-cyber-neonDim border border-cyber-neon/40 flex items-center justify-center text-cyber-neon text-lg">
+                        <i class="fa-brands fa-python"></i>
+                    </div>
+                    <div>
+                        <span id="modal-module-tier" class="text-[10px] font-mono uppercase text-cyber-purpleLight block">Ruta Principiante</span>
+                        <h3 id="modal-module-title" class="text-base sm:text-lg font-black text-white">Introducción a Python</h3>
+                    </div>
+                </div>
+                <button onclick="closeLessonModal()" class="w-9 h-9 rounded-xl bg-cyber-card hover:bg-cyber-border text-gray-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Pestañas Internas del Modal: 1. Cápsula Teórica | 2. Mini-Test Interactivo -->
+            <div class="px-5 pt-3 bg-[#0e131a] border-b border-cyber-border flex gap-4">
+                <button id="modal-tab-theory" onclick="switchLessonModalTab('theory')" class="pb-3 text-xs sm:text-sm font-bold border-b-2 border-cyber-neon text-cyber-neon flex items-center gap-2 transition">
+                    <i class="fa-solid fa-book-open"></i> 1. Cápsula de Estudio
+                </button>
+                <button id="modal-tab-quiz" onclick="switchLessonModalTab('quiz')" class="pb-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition">
+                    <i class="fa-solid fa-bolt"></i> 2. Examen Práctico (3 Preguntas)
+                </button>
+            </div>
+
+            <!-- Cuerpo del Modal -->
+            <div class="p-5 sm:p-6 max-h-[75vh] overflow-y-auto space-y-5">
+
+                <!-- SUB-VISTA A: CÁPSULA TEÓRICA -->
+                <div id="lesson-theory-content" class="space-y-4">
+                    <p id="modal-theory-text" class="text-sm text-gray-200 leading-relaxed"></p>
+
+                    <div class="bg-[#090d11] border border-cyber-border rounded-xl overflow-hidden">
+                        <div class="px-3.5 py-2 bg-cyber-bg border-b border-cyber-border flex items-center justify-between text-[11px] font-mono text-gray-400">
+                            <span><i class="fa-solid fa-code text-cyber-neon mr-1.5"></i>ejemplo_interactivo.py</span>
+                            <span>Python 3.12</span>
+                        </div>
+                        <pre id="modal-theory-code" class="p-4 text-xs sm:text-sm font-mono text-cyber-neon overflow-x-auto leading-relaxed"></pre>
+                    </div>
+
+                    <div class="bg-cyber-purpleDim border border-cyber-purple/40 rounded-xl p-4 flex items-start gap-3">
+                        <i class="fa-solid fa-circle-info text-cyber-purpleLight text-lg mt-0.5"></i>
+                        <div class="text-xs text-gray-200 space-y-1">
+                            <span class="font-bold text-white block">Recompensa del Examen:</span>
+                            Cada respuesta correcta en el test de este módulo te otorga instantáneamente <span class="text-cyber-neon font-mono font-bold">+50 XP</span> y <span class="text-cyber-amber font-mono font-bold">+10 PyCoins</span>.
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button onclick="switchLessonModalTab('quiz')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-cyber-neon text-black font-extrabold text-sm hover:brightness-110 transition shadow-neon-sm flex items-center justify-center gap-2">
+                            Ir al Examen Interactivo <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VISTA B: MINI-TEST INTERACTIVO -->
+                <div id="lesson-quiz-content" class="hidden space-y-5">
+                    <!-- Indicador de progreso de preguntas -->
+                    <div class="flex items-center justify-between gap-2">
+                        <span id="quiz-progress-label" class="text-xs font-mono text-cyber-neon uppercase font-bold">Pregunta 1 de 3</span>
+                        <div id="quiz-dots" class="flex items-center gap-1.5"></div>
+                    </div>
+
+                    <!-- Enunciado de la pregunta -->
+                    <div class="bg-cyber-bg border border-cyber-border rounded-xl p-4">
+                        <h4 id="quiz-question-text" class="text-base sm:text-lg font-bold text-white leading-snug"></h4>
+                    </div>
+
+                    <!-- Opciones de respuesta -->
+                    <div id="quiz-options-container" class="space-y-2.5"></div>
+
+                    <!-- Caja de Feedback Educativo (Correcto / Incorrecto) -->
+                    <div id="quiz-feedback-box" class="hidden rounded-xl p-4 border text-sm space-y-1"></div>
+
+                    <!-- Botones de navegación del test -->
+                    <div class="pt-2 flex items-center justify-between gap-3">
+                        <button onclick="switchLessonModalTab('theory')" class="text-xs font-mono text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-book"></i> Repasar Teoría
+                        </button>
+                        <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden px-6 py-2.5 rounded-xl bg-cyber-neon text-black font-extrabold text-sm hover:brightness-110 transition shadow-neon-sm">
+                            Siguiente Pregunta <i class="fa-solid fa-forward-step ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VISTA C: PANTALLA DE MÓDULO COMPLETADO -->
+                <div id="lesson-completed-content" class="hidden text-center py-6 space-y-5">
+                    <div class="w-20 h-20 rounded-full bg-cyber-neonDim border-2 border-cyber-neon mx-auto flex items-center justify-center text-4xl text-cyber-neon shadow-neon">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-mono uppercase text-cyber-neon">¡Módulo Dominado!</span>
+                        <h4 id="quiz-summary-title" class="text-2xl font-black text-white">¡Excelente trabajo, Hacker!</h4>
+                        <p id="quiz-summary-subtitle" class="text-sm text-gray-300 max-w-md mx-auto"></p>
+                    </div>
+                    <div class="flex justify-center gap-4">
+                        <div class="bg-cyber-bg border border-cyber-border px-4 py-3 rounded-xl">
+                            <span class="text-xs text-gray-400 font-mono block">Aciertos del Test</span>
+                            <span id="quiz-summary-score" class="text-lg font-black text-cyber-neon font-mono">3 / 3</span>
+                        </div>
+                        <div class="bg-cyber-bg border border-cyber-border px-4 py-3 rounded-xl">
+                            <span class="text-xs text-gray-400 font-mono block">Estado en Ruta</span>
+                            <span class="text-lg font-black text-cyber-purpleLight font-mono">COMPLETADO</span>
+                        </div>
+                    </div>
+                    <div class="pt-2 flex flex-col sm:flex-row justify-center gap-3">
+                        <button onclick="restartCurrentQuiz()" class="px-5 py-2.5 rounded-xl bg-cyber-bg hover:bg-cyber-border text-gray-200 border border-cyber-border font-bold text-sm transition">
+                            <i class="fa-solid fa-rotate mr-1.5"></i> Repetir Examen
+                        </button>
+                        <button onclick="closeLessonModal()" class="px-6 py-2.5 rounded-xl bg-cyber-neon text-black font-extrabold text-sm hover:brightness-110 transition shadow-neon-sm">
+                            Continuar en la Ruta <i class="fa-solid fa-check ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL DE CONFIRMACIÓN DE REINICIO (SIN ALERT/CONFIRM NATIVO)
+         ========================================== -->
+    <div id="reset-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center gap-3 text-cyber-danger">
+                <div class="w-11 h-11 rounded-xl bg-cyber-danger/15 border border-cyber-danger/40 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">¿Reiniciar progreso guardado?</h3>
+                    <p class="text-xs text-gray-400 font-mono">Acción sobre LocalStorage</p>
+                </div>
+            </div>
+            <p class="text-sm text-gray-300 leading-relaxed">
+                Se restablecerán tus puntos XP, rango universitario, PyCoins, lecciones aprobadas y retos diarios a sus valores iniciales de fábrica.
+            </p>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeResetModal()" class="px-4 py-2 rounded-xl bg-cyber-bg hover:bg-cyber-border text-gray-300 text-sm font-semibold border border-cyber-border transition">
+                    Cancelar
+                </button>
+                <button onclick="confirmResetProgress()" class="px-4 py-2 rounded-xl bg-cyber-danger text-white text-sm font-bold hover:brightness-110 transition">
+                    Sí, formatear progreso
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         LÓGICA Y ARQUITECTURA JAVASCRIPT COMPLETA
+         ========================================== -->
+    <script>
+        /* ==========================================================
+           1. DEFINICIÓN DE DATOS: RANGOS, RUTA, TESTS, RETOS Y LOGROS
+           ========================================================== */
+
+        const UNIVERSITY_RANKS = [
+            { id: 'script_junior', title: 'Script Junior', minXP: 0, maxXP: 200, level: 1, icon: 'fa-seedling', desc: 'Iniciando en la sintaxis e intérprete de Python.' },
+            { id: 'script_kiddie', title: 'Script Kiddie', minXP: 200, maxXP: 500, level: 2, icon: 'fa-terminal', desc: 'Dominio de estructuras de control, bucles y funciones.' },
+            { id: 'bug_hunter', title: 'Bug Hunter', minXP: 500, maxXP: 900, level: 3, icon: 'fa-bug-slash', desc: 'Especialista en POO, excepciones y depuración avanzada.' },
+            { id: 'backend_dev', title: 'Backend Dev', minXP: 900, maxXP: 1400, level: 4, icon: 'fa-server', desc: 'Arquitecto de APIs con FastAPI, bases de datos y scraping.' },
+            { id: 'python_master', title: 'Python Master', minXP: 1400, maxXP: 2500, level: 5, icon: 'fa-crown', desc: 'Leyenda universitaria del ecosistema Python.' }
+        ];
+
+        const ROADMAP_MODULES = [
+            // RUTA PRINCIPIANTE (Módulos 1 - 4)
+            {
+                id: 'mod_1',
+                tier: 'Ruta Principiante',
+                tierColor: 'neon',
+                order: 1,
+                title: 'Introducción a Python',
+                subtitle: 'Sintaxis limpia, print(), tipado dinámico e indentación.',
+                icon: 'fa-brands fa-python',
+                theory: 'Python es un lenguaje interpretado, multiparadigma y de tipado dinámico. A diferencia de otros lenguajes que usan llaves {}, Python delimita los bloques de código mediante la indentación (espacios). La función integrada print() permite enviar datos a la salida estándar.',
+                codeSnippet: `# Mi primer script en PyHack Academy\nnombre_hacker = "Neo"\nversion = 3.12\n\nprint(f"Conectado al nodo con Python {version}")\nprint("Hola,", nombre_hacker)`,
+                questions: [
+                    {
+                        q: '¿Cómo se delimitan los bloques de código (como dentro de un if o función) en Python?',
+                        options: [
+                            'Con llaves { } como en C o Java',
+                            'Mediante la indentación (espacios o tabulaciones)',
+                            'Usando las palabras clave BEGIN y END',
+                            'Terminando cada línea con punto y coma (;)'
+                        ],
+                        correct: 1,
+                        explanation: '¡Exacto! En Python la indentación (normalmente 4 espacios según PEP 8) define la estructura del bloque de código.'
+                    },
+                    {
+                        q: '¿Cuál es la salida de ejecutar: print(f"2 + 2 = {2 + 2}")?',
+                        options: [
+                            '2 + 2 = {2 + 2}',
+                            '2 + 2 = 4',
+                            'SyntaxError',
+                            'f"2 + 2 = 4"'
+                        ],
+                        correct: 1,
+                        explanation: 'Los f-strings (cadenas formateadas con f antes de las comillas) evalúan las expresiones dentro de llaves {}.'
+                    },
+                    {
+                        q: '¿Qué símbolo se utiliza en Python para escribir un comentario de una sola línea?',
+                        options: [
+                            '// Comentario',
+                            '/* Comentario */',
+                            '# Comentario',
+                            '-- Comentario'
+                        ],
+                        correct: 2,
+                        explanation: 'El carácter almohadilla (#) indica al intérprete de Python que ignore el resto de esa línea.'
+                    }
+                ]
+            },
+            {
+                id: 'mod_2',
+                tier: 'Ruta Principiante',
+                tierColor: 'neon',
+                order: 2,
+                title: 'Variables y Operadores',
+                subtitle: 'Tipos primitivos, división entera //, módulo % y potencia **.',
+                icon: 'fa-solid fa-sliders',
+                theory: 'En Python las variables se crean al asignarles un valor con "=". Contamos con operadores aritméticos potentes como "//" para división entera, "%" para obtener el residuo (módulo) y "**" para exponenciación.',
+                codeSnippet: `energia = 17\ncosto_pulso = 5\n\npulsos_completos = energia // costo_pulso  # Resultado: 3\nenergia_restante = energia % costo_pulso   # Resultado: 2\npotencia_cubo = 2 ** 3                     # Resultado: 8`,
+                questions: [
+                    {
+                        q: '¿Qué resultado devuelve la expresión 17 // 5 en Python?',
+                        options: [
+                            '3.4',
+                            '3',
+                            '2',
+                            '4'
+                        ],
+                        correct: 1,
+                        explanation: 'El operador // realiza la división entera (floor division), descartando la parte decimal.'
+                    },
+                    {
+                        q: '¿Cuál operador calcula la potencia (por ejemplo, 3 elevado a la 4)?',
+                        options: [
+                            '3 ^ 4',
+                            '3 ** 4',
+                            'pow_op(3, 4)',
+                            '3 ^^ 4'
+                        ],
+                        correct: 1,
+                        explanation: 'En Python, ** es el operador de exponenciación (3 ** 4 = 81), mientras que ^ es el operador bit a bit XOR.'
+                    },
+                    {
+                        q: '¿Qué devuelve type("42") en Python?',
+                        options: [
+                            "<class 'int'>",
+                            "<class 'str'>",
+                            "<class 'float'>",
+                            "<class 'char'>"
+                        ],
+                        correct: 1,
+                        explanation: 'Cualquier valor encerrado entre comillas simples o dobles es una cadena de texto (str).'
+                    }
+                ]
+            },
+            {
+                id: 'mod_3',
+                tier: 'Ruta Principiante',
+                tierColor: 'neon',
+                order: 3,
+                title: 'Bucles (For / While)',
+                subtitle: 'Iteración sobre secuencias, función range() y control con break.',
+                icon: 'fa-solid fa-repeat',
+                theory: 'El bucle "for" en Python itera directamente sobre los elementos de cualquier secuencia (listas, strings, o rangos generados con range()). El bucle "while" repite un bloque mientras su condición booleana siga siendo True.',
+                codeSnippet: `# Escaneo de puertos simulados con range(inicio, fin_excluido)\nfor puerto in range(8000, 8003):\n    print(f"Escaneando puerto {puerto}...")\n\n# Salida: 8000, 8001, 8002`,
+                questions: [
+                    {
+                        q: '¿Qué números genera la función list(range(1, 5))?',
+                        options: [
+                            '[1, 2, 3, 4, 5]',
+                            '[0, 1, 2, 3, 4]',
+                            '[1, 2, 3, 4]',
+                            '[2, 3, 4, 5]'
+                        ],
+                        correct: 2,
+                        explanation: 'range(inicio, fin) incluye el valor de inicio pero excluye el valor final, generando [1, 2, 3, 4].'
+                    },
+                    {
+                        q: '¿Qué palabra clave detiene inmediatamente la ejecución de un bucle por completo?',
+                        options: [
+                            'continue',
+                            'pass',
+                            'break',
+                            'stop'
+                        ],
+                        correct: 2,
+                        explanation: 'La instrucción break termina el bucle actual y continúa en la siguiente instrucción fuera del bucle.'
+                    },
+                    {
+                        q: '¿Qué ocurre si la condición de un bucle while nunca cambia a False y no hay un break?',
+                        options: [
+                            'Se detiene automáticamente a las 100 iteraciones',
+                            'Se produce un bucle infinito',
+                            'Python convierte el while en un for',
+                            'Retorna None inmediatamente'
+                        ],
+                        correct: 1,
+                        explanation: 'Si la condición siempre se evalúa como True, el bucle se ejecutará indefinidamente (bucle infinito).'
+                    }
+                ]
+            },
+            {
+                id: 'mod_4',
+                tier: 'Ruta Principiante',
+                tierColor: 'neon',
+                order: 4,
+                title: 'Condicionales (If / Elif / Else)',
+                subtitle: 'Toma de decisiones lógicas, operadores and, or, not.',
+                icon: 'fa-solid fa-code-branch',
+                theory: 'Las estructuras condicionales permiten bifurcar el flujo del programa. En Python se usa "if" para la condición inicial, "elif" (abreviatura de else if) para evaluar condiciones adicionales y "else" como caso por defecto.',
+                codeSnippet: `latencia_ms = 42\n\nif latencia_ms < 30:\n    estado = "Óptimo"\nelif latencia_ms <= 80:\n    estado = "Estable"\nelse:\n    estado = "Alerta de Lag"`,
+                questions: [
+                    {
+                        q: '¿Cómo se escribe "sino, si..." (else if) en Python?',
+                        options: [
+                            'elseif',
+                            'else if',
+                            'elif',
+                            'elsif'
+                        ],
+                        correct: 2,
+                        explanation: 'Python utiliza la palabra reservada elif para encadenar múltiples condiciones de forma legible.'
+                    },
+                    {
+                        q: '¿Cuál es el resultado de evaluar: (10 > 5) and (not True)?',
+                        options: [
+                            'True',
+                            'False',
+                            'None',
+                            '10'
+                        ],
+                        correct: 1,
+                        explanation: 'Aunque (10 > 5) es True, (not True) es False. Y True and False devuelve False.'
+                    },
+                    {
+                        q: 'En Python, ¿cuál de los siguientes valores se evalúa como False dentro de un if?',
+                        options: [
+                            'Una lista con un cero: [0]',
+                            'El texto "False"',
+                            'Una lista vacía: []',
+                            'El número -1'
+                        ],
+                        correct: 2,
+                        explanation: 'Las colecciones vacías ([], {}, ""), el 0 y None son valores "Falsy" en Python.'
+                    }
+                ]
+            },
+
+            // RUTA INTERMEDIA (Módulos 5 - 8)
+            {
+                id: 'mod_5',
+                tier: 'Ruta Intermedia',
+                tierColor: 'purple',
+                order: 5,
+                title: 'Funciones y Módulos',
+                subtitle: 'Definición con def, parámetros por defecto, return e import.',
+                icon: 'fa-solid fa-cubes',
+                theory: 'Las funciones encapsulan lógica reutilizable mediante la palabra clave "def". Pueden recibir argumentos posicionales o con valores por defecto y devolver resultados con "return". Los módulos permiten organizar código en paquetes e importarlos con "import".',
+                codeSnippet: `import math\n\ndef calcular_hash_nivel(xp, factor=1.5):\n    return math.floor(xp * factor)\n\npuntaje = calcular_hash_nivel(120)`,
+                questions: [
+                    {
+                        q: '¿Qué palabra reservada se utiliza para definir una función en Python?',
+                        options: [
+                            'function',
+                            'func',
+                            'def',
+                            'lambda_def'
+                        ],
+                        correct: 2,
+                        explanation: 'Todas las funciones estándar en Python se declaran usando la palabra clave def seguida del nombre y paréntesis.'
+                    },
+                    {
+                        q: '¿Qué devuelve automáticamente una función en Python si no incluye una sentencia return?',
+                        options: [
+                            '0',
+                            'False',
+                            'None',
+                            'Un error de compilación'
+                        ],
+                        correct: 2,
+                        explanation: 'Si una función finaliza sin ejecutar un return explícito, Python retorna el objeto especial None.'
+                    },
+                    {
+                        q: '¿Cómo importamos únicamente la función sqrt desde el módulo math?',
+                        options: [
+                            'import sqrt from math',
+                            'from math import sqrt',
+                            'using math.sqrt',
+                            'include math.sqrt'
+                        ],
+                        correct: 1,
+                        explanation: 'La sintaxis "from <modulo> import <funcion>" importa directamente el identificador al espacio de nombres actual.'
+                    }
+                ]
+            },
+            {
+                id: 'mod_6',
+                tier: 'Ruta Intermedia',
+                tierColor: 'purple',
+                order: 6,
+                title: 'Programación Orientada a Objetos',
+                subtitle: 'Clases, constructor __init__, atributo self, métodos y herencia.',
+                icon: 'fa-solid fa-object-group',
+                theory: 'La POO modela entidades mediante Clases (plantillas) y Objetos (instancias). El método especial "__init__" actúa como constructor inicializando los atributos de la instancia referenciada mediante "self".',
+                codeSnippet: `class AgenteCyber:\n    def __init__(self, alias, nivel=1):\n        self.alias = alias\n        self.nivel = nivel\n\n    def subir_nivel(self):\n        self.nivel += 1\n\nbot = AgenteCyber("ZeroCool", 5)`,
+                questions: [
+                    {
+                        q: '¿Cómo se llama el método constructor que se ejecuta al instanciar una clase en Python?',
+                        options: [
+                            '__construct__(self)',
+                            '__init__(self)',
+                            'constructor(self)',
+                            '__new_instance__(self)'
+                        ],
+                        correct: 1,
+                        explanation: 'El método dunder (doble guion bajo) __init__ inicializa los atributos del nuevo objeto creado.'
+                    },
+                    {
+                        q: '¿Qué representa el primer parámetro "self" dentro de los métodos de una instancia?',
+                        options: [
+                            'Una referencia a la clase padre global',
+                            'Una referencia a la propia instancia (objeto) actual',
+                            'Una variable privada estática',
+                            'El módulo donde se guardó el archivo'
+                        ],
+                        correct: 1,
+                        explanation: 'self apunta al objeto específico sobre el cual se está invocando el método, permitiendo acceder a sus atributos.'
+                    },
+                    {
+                        q: '¿Cómo indicamos en Python que la clase Estudiante hereda de la clase Persona?',
+                        options: [
+                            'class Estudiante extends Persona:',
+                            'class Estudiante(Persona):',
+                            'class Estudiante : Persona',
+                            'class Estudiante inherits Persona:'
+                        ],
+                        correct: 1,
+                        explanation: 'En Python la herencia se especifica colocando la clase base entre paréntesis: class SubClase(SuperClase):'
+                    }
+                ]
+            },
+            {
+                id: 'mod_7',
+                tier: 'Ruta Intermedia',
+                tierColor: 'purple',
+                order: 7,
+                title: 'Manejo de Excepciones',
+                subtitle: 'Bloques try, except, else, finally y lanzamiento con raise.',
+                icon: 'fa-solid fa-shield-halved',
+                theory: 'Para evitar que un programa colapse ante errores en tiempo de ejecución (como dividir por cero o fallos de red), usamos bloques "try" y "except". El bloque "finally" se ejecuta siempre, ocurra o no una excepción.',
+                codeSnippet: `try:\n    tasa = 100 / int(input_usuario)\nexcept ZeroDivisionError:\n    print("Error: No puedes dividir entre cero.")\nexcept ValueError:\n    print("Error: Ingresa un número válido.")\nfinally:\n    print("Proceso de validación cerrado.")`,
+                questions: [
+                    {
+                        q: '¿Qué bloque se utiliza para capturar y manejar un error ocurrido dentro de un bloque try?',
+                        options: [
+                            'catch',
+                            'except',
+                            'handle',
+                            'error'
+                        ],
+                        correct: 1,
+                        explanation: 'A diferencia de Java/JS que usan catch, Python utiliza la palabra clave except.'
+                    },
+                    {
+                        q: '¿Cuándo se ejecuta el código dentro del bloque finally?',
+                        options: [
+                            'Solo cuando ocurre una excepción',
+                            'Solo cuando NO ocurre ninguna excepción',
+                            'Siempre, tanto si hubo excepción como si no',
+                            'Únicamente si se llama a raise'
+                        ],
+                        correct: 2,
+                        explanation: 'El bloque finally se ejecuta siempre al finalizar el bloque try/except, ideal para liberar recursos o cerrar conexiones.'
+                    },
+                    {
+                        q: '¿Qué instrucción permite lanzar manualmente una excepción en Python?',
+                        options: [
+                            'throw ValueError("Dato inválido")',
+                            'raise ValueError("Dato inválido")',
+                            'emit ValueError("Dato inválido")',
+                            'trigger ValueError("Dato inválido")'
+                        ],
+                        correct: 1,
+                        explanation: 'En Python se utiliza la sentencia raise para disparar excepciones personalizadas o predefinidas.'
+                    }
+                ]
+            },
+            {
+                id: 'mod_8',
+                tier: 'Ruta Intermedia',
+                tierColor: 'purple',
+                order: 8,
+                title: 'Manejo de Archivos y Contextos',
+                subtitle: 'Administrador de contexto with open(), modos r, w, a y JSON.',
+                icon: 'fa-solid fa-file-code',
+                theory: 'El administrador de contexto "with open(...) as f:" garantiza que el archivo se cierre automáticamente al terminar el bloque, incluso si ocurre un error. Los modos principales son "r" (lectura), "w" (sobrescritura) y "a" (anexar al final).',
+                codeSnippet: `import json\n\nconfig = {"modo": "cyberpunk", "nivel_max": 99}\n\nwith open("config.json", "w", encoding="utf-8") as archivo:\n    json.dump(config, archivo, indent=2)`,
+                questions: [
+                    {
+                        q: '¿Cuál es la ventaja principal de abrir archivos usando "with open(...) as f:"?',
+                        options: [
+                            'Hace que el archivo pese la mitad en disco',
+                            'Cierra el archivo automáticamente al salir del bloque',
+                            'Convierte cualquier archivo a formato binario',
+                            'Permite editar archivos sin permisos de sistema'
+                        ],
+                        correct: 1,
+                        explanation: 'El context manager (with) invoca automáticamente el método __exit__ cerrando el descriptor del archivo de forma segura.'
+                    },
+                    {
+                        q: '¿Qué modo de apertura añade contenido al final de un archivo existente sin borrar lo anterior?',
+                        options: [
+                            '"w" (write)',
+                            '"r" (read)',
+                            '"a" (append)',
+                            '"x" (exclusive)'
+                        ],
+                        correct: 2,
+                        explanation: 'El modo "a" (append) posiciona el cursor al final del archivo para agregar datos sin truncar el contenido previo.'
+                    },
+                    {
+                        q: '¿Qué método del módulo json convierte un string JSON en un diccionario de Python?',
+                        options: [
+                            'json.loads()',
+                            'json.dumps()',
+                            'json.parse_str()',
+                            'json.encode()'
+                        ],
+                        correct: 0,
+                        explanation: 'json.loads() (load string) deserializa una cadena JSON convirtiéndola en estructuras nativas de Python (dict/list).'
+                    }
+                ]
+            },
+
+            // RUTA PROGRAMADOR PRO (Módulos 9 - 12)
+            {
+                id: 'mod_9',
+                tier: 'Ruta Programador Pro',
+                tierColor: 'amber',
+                order: 9,
+                title: 'Decoradores y Generadores',
+                subtitle: 'Funciones de orden superior, @wraps y evaluación perezosa con yield.',
+                icon: 'fa-solid fa-wand-magic-sparkles',
+                theory: 'Un decorador (@mi_decorador) es una función que envuelve a otra para extender su comportamiento sin modificar su código fuente. Por otro lado, los generadores usan "yield" en lugar de "return" para producir valores bajo demanda ahorrando memoria RAM.',
+                codeSnippet: `def generador_hashes(limite):\n    for n in range(limite):\n        yield f"0x{n:04x}"  # Pausa y entrega un valor a la vez\n\nstream = generador_hashes(1000000)\nprint(next(stream))  # 0x0000 (¡Sin llenar la memoria!)`,
+                questions: [
+                    {
+                        q: '¿Qué palabra clave convierte una función normal en una función generadora (generator)?',
+                        options: [
+                            'async',
+                            'yield',
+                            'stream',
+                            'defer'
+                        ],
+                        correct: 1,
+                        explanation: 'La sentencia yield pausa la ejecución de la función guardando su estado y entrega el valor al iterador.'
+                    },
+                    {
+                        q: '¿Qué símbolo se coloca justo encima de la definición de una función para aplicarle un decorador?',
+                        options: [
+                            '#decorador',
+                            '$decorador',
+                            '@decorador',
+                            '&decorador'
+                        ],
+                        correct: 2,
+                        explanation: 'La sintaxis @nombre_decorador es azúcar sintáctico para funcion = nombre_decorador(funcion).'
+                    },
+                    {
+                        q: '¿Cuál es el principal beneficio de usar un generador frente a devolver una lista de 10 millones de elementos?',
+                        options: [
+                            'Se ejecuta en múltiples tarjetas gráficas a la vez',
+                            'Consumo mínimo de memoria gracias a la evaluación perezosa (lazy evaluation)',
+                            'Ordena automáticamente los elementos de mayor a menor',
+                            'No requiere instalar Python para ejecutarse'
+                        ],
+                        correct: 1,
+                        explanation: 'Los generadores calculan y entregan un elemento a la vez bajo demanda, manteniendo un uso de memoria constante O(1).'
+                    }
+                ]
+            },
+            {
+                id: 'mod_10',
+                tier: 'Ruta Programador Pro',
+                tierColor: 'amber',
+                order: 10,
+                title: 'APIs Modernas con FastAPI',
+                subtitle: 'Rutas asíncronas async def, tipado Pydantic y documentación OpenAPI.',
+                icon: 'fa-solid fa-bolt-lightning',
+                theory: 'FastAPI es el framework moderno de alto rendimiento para construir APIs REST con Python. Aprovecha las anotaciones de tipo (type hints) y Pydantic para validar datos automáticamente y generar documentación interactiva en /docs.',
+                codeSnippet: `from fastapi import FastAPI\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\nclass Item(BaseModel):\n    nombre: str\n    precio: float\n\n@app.post("/items")\nasync def crear_item(item: Item):\n    return {"status": "ok", "item": item}`,
+                questions: [
+                    {
+                        q: '¿Qué librería utiliza FastAPI por defecto para definir esquemas y validar tipos de datos?',
+                        options: [
+                            'Marshmallow',
+                            'Pydantic',
+                            'BeautifulSoup',
+                            'Tkinter'
+                        ],
+                        correct: 1,
+                        explanation: 'FastAPI se apoya en BaseModel de Pydantic para validar, serializar y documentar cuerpos de peticiones JSON.'
+                    },
+                    {
+                        q: '¿En qué ruta URL genera FastAPI automáticamente la interfaz interactiva Swagger UI?',
+                        options: [
+                            '/swagger-admin',
+                            '/api-panel',
+                            '/docs',
+                            '/help'
+                        ],
+                        correct: 2,
+                        explanation: 'Por defecto, al levantar un servidor FastAPI con Uvicorn, la documentación interactiva Swagger está disponible en /docs.'
+                    },
+                    {
+                        q: '¿Qué decorador define un endpoint que responde a peticiones HTTP GET en la raíz de la API?',
+                        options: [
+                            '@app.route("/", method="GET")',
+                            '@app.get("/")',
+                            '@fastapi.fetch("/")',
+                            '@get_endpoint("/")'
+                        ],
+                        correct: 1,
+                        explanation: '@app.get("/") registra una operación de ruta específica para el verbo HTTP GET.'
+                    }
+                ]
+            },
+            {
+                id: 'mod_11',
+                tier: 'Ruta Programador Pro',
+                tierColor: 'amber',
+                order: 11,
+                title: 'Web Scraping Automatizado',
+                subtitle: 'Peticiones HTTP con requests, parseo del DOM con BeautifulSoup.',
+                icon: 'fa-solid fa-spider',
+                theory: 'El Web Scraping permite extraer datos estructurados de páginas web. Combinamos "requests" para descargar el HTML y "BeautifulSoup" (bs4) para buscar etiquetas, clases CSS o selectores de forma programática.',
+                codeSnippet: `import requests\nfrom bs4 import BeautifulSoup\n\nresp = requests.get("https://ejemplo.edu/noticias")\nsoup = BeautifulSoup(resp.text, "html.parser")\n\ntitulares = [h2.text.strip() for h2 in soup.select("h2.titulo")]`,
+                questions: [
+                    {
+                        q: 'En la librería requests, ¿qué atributo contiene el código de estado HTTP (ej. 200, 404)?',
+                        options: [
+                            'resp.http_code',
+                            'resp.status_code',
+                            'resp.code()',
+                            'resp.state'
+                        ],
+                        correct: 1,
+                        explanation: 'El atributo status_code devuelve el entero correspondiente a la respuesta HTTP (200 OK, 404 Not Found, etc.).'
+                    },
+                    {
+                        q: 'En BeautifulSoup, ¿qué método devuelve una lista con TODAS las etiquetas que coinciden con un filtro?',
+                        options: [
+                            'soup.find_one()',
+                            'soup.find_all()',
+                            'soup.search_every()',
+                            'soup.get_tags()'
+                        ],
+                        correct: 1,
+                        explanation: 'soup.find_all("a") o soup.select() recupera todas las coincidencias en el árbol HTML parseado.'
+                    },
+                    {
+                        q: '¿Qué archivo estándar de un sitio web indica qué rutas están permitidas o restringidas para los bots de scraping?',
+                        options: [
+                            'sitemap.html',
+                            'robots.txt',
+                            'bot_rules.json',
+                            'security.cfg'
+                        ],
+                        correct: 1,
+                        explanation: 'El estándar de exclusión de robots se publica en /robots.txt para indicar las políticas de rastreo del servidor.'
+                    }
+                ]
+            },
+            {
+                id: 'mod_12',
+                tier: 'Ruta Programador Pro',
+                tierColor: 'amber',
+                order: 12,
+                title: 'Conexión a Bases de Datos y SQL',
+                subtitle: 'sqlite3, consultas parametrizadas anti-SQL Injection y ORMs.',
+                icon: 'fa-solid fa-database',
+                theory: 'Python incluye de serie el módulo "sqlite3" y se integra con motores empresariales (PostgreSQL, MySQL) mediante drivers o SQLAlchemy ORM. Es crítico usar siempre consultas parametrizadas (?) para prevenir ataques de Inyección SQL.',
+                codeSnippet: `import sqlite3\n\nwith sqlite3.connect("academia.db") as conn:\n    cursor = conn.cursor()\n    # Consulta parametrizada segura contra SQL Injection\n    cursor.execute(\n        "SELECT alias, xp FROM usuarios WHERE xp >= ?",\n        (500,)\n    )\n    top_users = cursor.fetchall()`,
+                questions: [
+                    {
+                        q: '¿Por qué NUNCA debes concatenar strings con f-strings directamente dentro de una consulta SQL?',
+                        options: [
+                            'Porque SQLite no acepta letras mayúsculas',
+                            'Porque expone la aplicación a vulnerabilidades de Inyección SQL (SQLi)',
+                            'Porque consume el doble de ancho de banda',
+                            'Porque Python borra la tabla automáticamente'
+                        ],
+                        correct: 1,
+                        explanation: 'Concatenar entradas de usuario directamente permite inyectar comandos SQL maliciosos. Siempre deben usarse placeholders (?).'
+                    },
+                    {
+                        q: '¿Qué método confirma y guarda de forma permanente los cambios (INSERT/UPDATE) en una transacción?',
+                        options: [
+                            'conn.save()',
+                            'conn.push()',
+                            'conn.commit()',
+                            'conn.Persist()'
+                        ],
+                        correct: 2,
+                        explanation: 'conn.commit() confirma la transacción actual en la base de datos para que los cambios sean persistentes.'
+                    },
+                    {
+                        q: '¿Qué método del cursor recupera todas las filas resultantes de una consulta SELECT como una lista de tuplas?',
+                        options: [
+                            'cursor.get_rows()',
+                            'cursor.fetchall()',
+                            'cursor.select_all()',
+                            'cursor.read_list()'
+                        ],
+                        correct: 1,
+                        explanation: 'cursor.fetchall() retorna todas las filas restantes del conjunto de resultados de la consulta.'
+                    }
+                ]
+            }
+        ];
+
+        const DAILY_CHALLENGES = [
+            {
+                id: 'challenge_1',
+                title: 'Reto #1: Corrige el Bug en el Validador de Acceso',
+                difficulty: 'Fácil',
+                filename: 'auth_validator.py',
+                desc: 'El sistema de seguridad de la universidad tiene un bug crítico: la función verificar_acceso(nivel) usa el operador de asignación o condición errónea y tampoco devuelve el booleano esperado. Corrige la función para que retorne True si nivel >= 10 y False en caso contrario.',
+                goal: 'La función verificar_acceso(nivel) debe usar "return" para devolver True cuando nivel >= 10, o False si es menor.',
+                hint: 'Asegúrate de usar el operador ">=" y la palabra clave "return" (por ejemplo: return nivel >= 10).',
+                starterCode: `def verificar_acceso(nivel):\n    # BUG DETECTADO: Corrige la lógica de retorno\n    if nivel < 10:\n        print("Acceso concedido")\n    else:\n        print("Acceso denegado")`,
+                solutionCode: `def verificar_acceso(nivel):\n    if nivel >= 10:\n        return True\n    else:\n        return False`,
+                validate: function(code) {
+                    const clean = code.replace(/\s+/g, ' ').trim();
+                    const hasDef = /def\s+verificar_acceso\s*\(\s*nivel\s*\)\s*:/.test(clean);
+                    const hasDirectReturn = /return\s+nivel\s*>=\s*10/.test(clean) || /return\s+bool\(\s*nivel\s*>=\s*10\s*\)/.test(clean);
+                    const hasIfElseReturn = (/if\s+nivel\s*>=\s*10\s*:\s*return\s+True/.test(clean) && /return\s+False/.test(clean));
+                    return hasDef && (hasDirectReturn || hasIfElseReturn);
+                }
+            },
+            {
+                id: 'challenge_2',
+                title: 'Reto #2: Optimiza el Bucle de Pares con List Comprehension',
+                difficulty: 'Intermedio',
+                filename: 'optimizer_loop.py',
+                desc: 'Un script heredado filtra números pares y los eleva al cuadrado usando 6 líneas lentas. Reescribe la función cuadrados_pares(numeros) usando una List Comprehension en Python que devuelva los cuadrados de los números pares (n % 2 == 0).',
+                goal: 'Debe retornar una lista comprensiva con [n ** 2 for n in numeros if n % 2 == 0] (o usando n * n).',
+                hint: 'Usa la sintaxis: return [n**2 for n in numeros if n % 2 == 0]',
+                starterCode: `def cuadrados_pares(numeros):\n    # Optimiza este código usando List Comprehension en el return\n    resultado = []\n    for n in numeros:\n        if n % 2 == 0:\n            resultado.append(n ** 2)\n    return resultado`,
+                solutionCode: `def cuadrados_pares(numeros):\n    return [n ** 2 for n in numeros if n % 2 == 0]`,
+                validate: function(code) {
+                    const clean = code.replace(/\s+/g, ' ').trim();
+                    const hasDef = /def\s+cuadrados_pares\s*\(\s*numeros\s*\)\s*:/.test(clean);
+                    const hasComprehension = /return\s*\[\s*(n\s*\*\*\s*2|n\s*\*\s*n)\s+for\s+n\s+in\s+numeros\s+if\s+n\s*%\s*2\s*==\s*0\s*\]/.test(clean);
+                    return hasDef && hasComprehension;
+                }
+            },
+            {
+                id: 'challenge_3',
+                title: 'Reto #3: Extractor Seguro de Payload API',
+                difficulty: 'Avanzado',
+                filename: 'api_parser.py',
+                desc: 'Al consumir un webhook externo, a veces el diccionario "payload" no trae la clave "token", provocando un KeyError que tumba el servidor. Completa obtener_token(payload) usando el método seguro .get() de los diccionarios para retornar el valor de "token" o "ANONIMO" por defecto.',
+                goal: 'Usa payload.get("token", "ANONIMO") dentro de la sentencia return.',
+                hint: 'En Python, diccionario.get("clave", "valor_por_defecto") evita el KeyError.',
+                starterCode: `def obtener_token(payload):\n    # Evita el KeyError usando el método .get() con valor por defecto "ANONIMO"\n    return payload["token"]`,
+                solutionCode: `def obtener_token(payload):\n    return payload.get("token", "ANONIMO")`,
+                validate: function(code) {
+                    const clean = code.replace(/\s+/g, ' ').trim();
+                    const hasDef = /def\s+obtener_token\s*\(\s*payload\s*\)\s*:/.test(clean);
+                    const hasSafeGet = /return\s+payload\.get\(\s*['"]token['"]\s*,\s*['"]ANONIMO['"]\s*\)/.test(clean);
+                    return hasDef && hasSafeGet;
+                }
+            }
+        ];
+
+        const ACHIEVEMENTS_LIST = [
+            {
+                id: 'ach_first_blood',
+                title: 'Hello World!',
+                desc: 'Completa tu primera lección interactiva en la Ruta Universitaria.',
+                icon: 'fa-solid fa-terminal',
+                check: (s) => s.completedLessons.length >= 1
+            },
+            {
+                id: 'ach_beginner_grad',
+                title: 'Graduado Principiante',
+                desc: 'Domina los 4 módulos de la Ruta Principiante.',
+                icon: 'fa-solid fa-graduation-cap',
+                check: (s) => ['mod_1', 'mod_2', 'mod_3', 'mod_4'].every(id => s.completedLessons.includes(id))
+            },
+            {
+                id: 'ach_bug_slayer',
+                title: 'Cazador de Bugs',
+                desc: 'Resuelve con éxito al menos 1 Reto Diario en la terminal Hackfy.',
+                icon: 'fa-solid fa-bug-slash',
+                check: (s) => s.completedChallenges.length >= 1
+            },
+            {
+                id: 'ach_hackfy_champ',
+                title: 'Trifecta Hackfy',
+                desc: 'Supera los 3 Retos Técnicos del Día.',
+                icon: 'fa-solid fa-laptop-code',
+                check: (s) => s.completedChallenges.length >= 3
+            },
+            {
+                id: 'ach_crypto_whale',
+                title: 'Tesorería Cyber',
+                desc: 'Acumula 100 o más PyCoins en tu billetera.',
+                icon: 'fa-solid fa-coins',
+                check: (s) => s.coins >= 100
+            },
+            {
+                id: 'ach_rank_kiddie',
+                title: 'Ascenso Universitario',
+                desc: 'Alcanza los 200 XP y asciende al rango Script Kiddie o superior.',
+                icon: 'fa-solid fa-rocket',
+                check: (s) => s.xp >= 200
+            },
+            {
+                id: 'ach_rank_hunter',
+                title: 'Élite Bug Hunter',
+                desc: 'Supera los 500 XP en la plataforma.',
+                icon: 'fa-solid fa-shield-virus',
+                check: (s) => s.xp >= 500
+            },
+            {
+                id: 'ach_python_master',
+                title: 'Arquitecto Python Master',
+                desc: 'Alcanza 1400 XP o completa los 12 módulos del árbol universitario.',
+                icon: 'fa-solid fa-crown',
+                check: (s) => s.xp >= 1400 || s.completedLessons.length >= 12
+            }
+        ];
+
+        const COMPETITORS_BASE = [
+            { id: 'comp_1', name: 'Valentina_Dev', avatar: 'fa-user-astronaut', xp: 1450, color: 'text-cyber-neon' },
+            { id: 'comp_2', name: 'RootKidd_99', avatar: 'fa-user-secret', xp: 1120, color: 'text-cyber-purpleLight' },
+            { id: 'comp_3', name: 'Mateo_FastAPI', avatar: 'fa-user-graduate', xp: 840, color: 'text-sky-400' },
+            { id: 'comp_4', name: 'Sofi_PyData', avatar: 'fa-user-ninja', xp: 560, color: 'text-amber-400' },
+            { id: 'comp_5', name: 'ByteWalker_VE', avatar: 'fa-user-gear', xp: 340, color: 'text-emerald-400' },
+            { id: 'comp_6', name: 'KernelPanic01', avatar: 'fa-robot', xp: 180, color: 'text-pink-400' },
+            { id: 'comp_7', name: 'NullPointer_Jr', avatar: 'fa-ghost', xp: 90, color: 'text-gray-400' }
+        ];
+
+        /* ==========================================================
+           2. ESTADO GLOBAL Y PERSISTENCIA EN LOCALSTORAGE
+           ========================================================== */
+
+        const STORAGE_KEY = 'pyhack_academy_state_v2';
+
+        const DEFAULT_STATE = {
+            username: 'CyberStudent_PY',
+            xp: 50,
+            coins: 50,
+            streak: 3,
+            lastActiveDate: new Date().toISOString().slice(0, 10),
+            completedLessons: [],
+            completedChallenges: [],
+            unlockedAchievements: [],
+            awardedQuestions: [], // Para evitar farmear infinitamente la misma pregunta o llevar control limpio
+            sequentialLock: false, // false = Acceso Libre a cualquier módulo; true = Secuencial estricto
+            soundEnabled: true,
+            activeView: 'roadmap',
+            activeChallengeId: 'challenge_1'
+        };
+
+        let appState = loadState();
+
+        // Variables de sesión para el modal de lección y examen
+        let currentModule = null;
+        let currentQuizIndex = 0;
+        let currentQuizScore = 0;
+        let currentQuestionAnswered = false;
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+                const parsed = JSON.parse(raw);
+                return { ...JSON.parse(JSON.stringify(DEFAULT_STATE)), ...parsed };
+            } catch (err) {
+                console.warn('Error leyendo LocalStorage, usando estado por defecto:', err);
+                return JSON.parse(JSON.stringify(DEFAULT_STATE));
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } catch (err) {
+                console.warn('No se pudo guardar en LocalStorage:', err);
+            }
+        }
+
+        /* ==========================================================
+           3. MOTOR DE EFECTOS DE SONIDO SINTETIZADOS (WEB AUDIO API)
+           ========================================================== */
+
+        let audioCtx = null;
+
+        function playCyberSound(type) {
+            if (!appState.soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(190, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.25);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'levelup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.09);
+                    osc.frequency.setValueAtTime(659.25, now + 0.18);
+                    osc.frequency.setValueAtTime(880, now + 0.27);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                    osc.start(now);
+                    osc.stop(now + 0.55);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch (e) {
+                // Ignorar si el navegador bloquea audio sin interacción
+            }
+        }
+
+        function toggleSound() {
+            appState.soundEnabled = !appState.soundEnabled;
+            saveState();
+            updateSoundUI();
+            if (appState.soundEnabled) playCyberSound('click');
+            showToast(
+                appState.soundEnabled ? 'Efectos de sonido activados' : 'Efectos de sonido silenciados',
+                'info'
+            );
+        }
+
+        function updateSoundUI() {
+            const iconDesktop = document.getElementById('sound-icon');
+            const labelDesktop = document.getElementById('sound-label');
+            const iconMobile = document.getElementById('sound-icon-mobile');
+
+            if (appState.soundEnabled) {
+                iconDesktop.className = 'fa-solid fa-volume-high text-cyber-neon';
+                labelDesktop.textContent = 'SFX ON';
+                iconMobile.className = 'fa-solid fa-volume-high text-sm text-cyber-neon';
+            } else {
+                iconDesktop.className = 'fa-solid fa-volume-xmark text-gray-500';
+                labelDesktop.textContent = 'SFX OFF';
+                iconMobile.className = 'fa-solid fa-volume-xmark text-sm text-gray-500';
+            }
+        }
+
+        /* ==========================================================
+           4. SISTEMA DE RANGOS, XP, MONEDAS Y NOTIFICACIONES
+           ========================================================== */
+
+        function getRankForXP(xp) {
+            for (let i = UNIVERSITY_RANKS.length - 1; i >= 0; i--) {
+                if (xp >= UNIVERSITY_RANKS[i].minXP) {
+                    return UNIVERSITY_RANKS[i];
+                }
+            }
+            return UNIVERSITY_RANKS[0];
+        }
+
+        function addRewards(xpAmount, coinsAmount, reasonText) {
+            const previousRank = getRankForXP(appState.xp);
+            appState.xp += xpAmount;
+            appState.coins += coinsAmount;
+            const newRank = getRankForXP(appState.xp);
+
+            checkAndUnlockAchievements();
+            saveState();
+            renderAll();
+
+            // Mostrar notificación flotante de ganancia
+            showToast(`${reasonText}: +${xpAmount} XP | +${coinsAmount} PyCoins`, 'xp');
+
+            // Si subió de rango universitario, celebrar
+            if (newRank.id !== previousRank.id) {
+                playCyberSound('levelup');
+                setTimeout(() => {
+                    showToast(`¡ASCENSO UNIVERSITARIO! Ahora eres ${newRank.title} (Nivel ${newRank.level})`, 'rankup');
+                }, 450);
+            }
+        }
+
+        function checkAndUnlockAchievements() {
+            ACHIEVEMENTS_LIST.forEach(ach => {
+                if (!appState.unlockedAchievements.includes(ach.id) && ach.check(appState)) {
+                    appState.unlockedAchievements.push(ach.id);
+                    setTimeout(() => {
+                        playCyberSound('levelup');
+                        showToast(`¡Medalla Desbloqueada!: ${ach.title}`, 'badge');
+                    }, 300);
+                }
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let borderStyle = 'border-cyber-border bg-cyber-card text-white';
+            let iconHtml = '<i class="fa-solid fa-circle-info text-cyber-neon"></i>';
+
+            if (type === 'xp') {
+                borderStyle = 'border-cyber-neon bg-[#0c2117]/95 text-white shadow-neon-sm';
+                iconHtml = '<i class="fa-solid fa-bolt text-cyber-neon text-lg"></i>';
+            } else if (type === 'rankup') {
+                borderStyle = 'border-cyber-purple bg-[#201136]/95 text-white shadow-purple';
+                iconHtml = '<i class="fa-solid fa-crown text-cyber-amber text-lg"></i>';
+            } else if (type === 'badge') {
+                borderStyle = 'border-cyber-amber bg-[#241c09]/95 text-white';
+                iconHtml = '<i class="fa-solid fa-medal text-cyber-amber text-lg"></i>';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border ${borderStyle} backdrop-blur-md text-xs sm:text-sm font-semibold transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `
+                <div class="shrink-0">${iconHtml}</div>
+                <div class="flex-1 leading-snug">${message}</div>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3400);
+        }
+
+        function triggerStreakInfo() {
+            playCyberSound('click');
+            showToast(`¡Racha activa de ${appState.streak} días estudiando Python sin interrupciones! 🔥`, 'info');
+        }
+
+        /* ==========================================================
+           5. RENDERIZADO DEL PANEL SUPERIOR Y NAVEGACIÓN
+           ========================================================== */
+
+        function renderHeaderAndSidebar() {
+            const rank = getRankForXP(appState.xp);
+
+            // Actualizar Rango y Nivel
+            document.getElementById('header-rank-title').textContent = rank.title;
+            document.getElementById('header-level-pill').textContent = `NV. ${rank.level}`;
+            document.getElementById('header-rank-icon').innerHTML = `<i class="fa-solid ${rank.icon}"></i>`;
+
+            // Calcular porcentaje de barra de nivel
+            const currentTierSpan = rank.maxXP - rank.minXP;
+            const progressInTier = Math.min(appState.xp - rank.minXP, currentTierSpan);
+            const percentage = Math.max(4, Math.min(100, Math.round((progressInTier / currentTierSpan) * 100)));
+
+            document.getElementById('header-xp-current').textContent = appState.xp;
+            document.getElementById('header-xp-next').textContent = rank.maxXP;
+            document.getElementById('header-xp-bar').style.width = `${percentage}%`;
+
+            // Racha y Monedas
+            document.getElementById('header-streak-count').textContent = appState.streak;
+            document.getElementById('header-coins-count').textContent = appState.coins;
+
+            // Contadores del Sidebar
+            document.getElementById('sidebar-modules-done').textContent = `${appState.completedLessons.length}/${ROADMAP_MODULES.length}`;
+            document.getElementById('sidebar-challenges-done').textContent = `${appState.completedChallenges.length}/${DAILY_CHALLENGES.length}`;
+            document.getElementById('sidebar-badge-count').textContent = `${appState.unlockedAchievements.length}/${ACHIEVEMENTS_LIST.length}`;
+
+            updateSoundUI();
+        }
+
+        function switchView(viewName) {
+            playCyberSound('click');
+            appState.activeView = viewName;
+            saveState();
+
+            const views = ['roadmap', 'challenges', 'leaderboard', 'achievements'];
+            views.forEach(v => {
+                const section = document.getElementById(`view-${v}`);
+                if (v === viewName) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Actualizar estado activo en botones de Escritorio
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const target = btn.getAttribute('data-nav');
+                if (target === viewName) {
+                    btn.className = 'nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-bold text-sm bg-cyber-neonDim text-cyber-neon border border-cyber-neon/40 shadow-neon-sm transition-all duration-200';
+                } else {
+                    btn.className = 'nav-btn w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-cyber-bg/60 border border-transparent transition-all duration-200';
+                }
+            });
+
+            // Actualizar estado activo en barra inferior Móvil (Android PWA)
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                const target = btn.getAttribute('data-nav-mobile');
+                if (target === viewName) {
+                    btn.className = 'mobile-nav-btn relative flex flex-col items-center justify-center py-1.5 px-4 rounded-xl bg-cyber-neonDim text-cyber-neon border border-cyber-neon/30 transition-all';
+                } else {
+                    btn.className = 'mobile-nav-btn relative flex flex-col items-center justify-center py-1.5 px-4 rounded-xl text-gray-400 hover:text-white transition-all';
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ==========================================================
+           6. RENDERIZADO DE LA RUTA UNIVERSITARIA (SKILL TREE)
+           ========================================================== */
+
+        function isModuleUnlocked(mod, index) {
+            if (!appState.sequentialLock) return true; // Modo Acceso Libre
+            if (index === 0) return true;
+            const prevMod = ROADMAP_MODULES[index - 1];
+            return appState.completedLessons.includes(prevMod.id);
+        }
+
+        function toggleUnlockMode() {
+            playCyberSound('click');
+            appState.sequentialLock = !appState.sequentialLock;
+            saveState();
+            renderRoadmap();
+            showToast(
+                appState.sequentialLock
+                    ? 'Modo Secuencial activado: supera cada módulo en orden.'
+                    : 'Modo Libre activado: todos los módulos están abiertos para estudiar.',
+                'info'
+            );
+        }
+
+        function renderRoadmap() {
+            const btn = document.getElementById('unlock-mode-btn');
+            const txt = document.getElementById('unlock-mode-text');
+
+            if (appState.sequentialLock) {
+                btn.className = 'px-3.5 py-2 rounded-lg text-xs font-mono font-bold border transition flex items-center justify-between gap-3 bg-cyber-purpleDim border-cyber-purple text-cyber-purpleLight';
+                txt.innerHTML = '<i class="fa-solid fa-lock mr-1.5"></i>Progresión Secuencial';
+            } else {
+                btn.className = 'px-3.5 py-2 rounded-lg text-xs font-mono font-bold border transition flex items-center justify-between gap-3 bg-cyber-neonDim border-cyber-neon text-cyber-neon';
+                txt.innerHTML = '<i class="fa-solid fa-unlock-keyhole mr-1.5"></i>Acceso Libre Activo';
+            }
+
+            const tiers = [
+                {
+                    name: 'Ruta Principiante',
+                    badge: 'NIVEL I • FUNDAMENTOS DE PROGRAMACIÓN',
+                    desc: 'Domina la sintaxis base de Python, tipos de datos, bucles y control de flujo.',
+                    accentClass: 'from-cyber-neon/20 to-transparent border-cyber-neon/40 text-cyber-neon'
+                },
+                {
+                    name: 'Ruta Intermedia',
+                    badge: 'NIVEL II • ARQUITECTURA Y ESTRUCTURAS',
+                    desc: 'Modulariza código con funciones, clases POO, manejo de errores y persistencia en archivos.',
+                    accentClass: 'from-cyber-purple/25 to-transparent border-cyber-purple/40 text-cyber-purpleLight'
+                },
+                {
+                    name: 'Ruta Programador Pro',
+                    badge: 'NIVEL III • INGENIERÍA DE SOFTWARE AVANZADA',
+                    desc: 'Construye herramientas profesionales con generadores, FastAPI, Web Scraping y SQL seguro.',
+                    accentClass: 'from-amber-500/20 to-transparent border-amber-500/40 text-cyber-amber'
+                }
+            ];
+
+            const container = document.getElementById('roadmap-tiers-container');
+            container.innerHTML = '';
+
+            tiers.forEach((tierInfo, tierIdx) => {
+                const modulesInTier = ROADMAP_MODULES.filter(m => m.tier === tierInfo.name);
+                const completedInTier = modulesInTier.filter(m => appState.completedLessons.includes(m.id)).length;
+
+                const tierSection = document.createElement('div');
+                tierSection.className = 'space-y-4';
+
+                // Cabecera del Rango de la Ruta
+                tierSection.innerHTML = `
+                    <div class="rounded-2xl bg-gradient-to-r ${tierInfo.accentClass} border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <span class="text-[11px] font-mono uppercase tracking-wider opacity-90 block">${tierInfo.badge}</span>
+                            <h2 class="text-xl sm:text-2xl font-black text-white">${tierInfo.name}</h2>
+                            <p class="text-xs sm:text-sm text-gray-300 mt-0.5">${tierInfo.desc}</p>
+                        </div>
+                        <div class="bg-cyber-bg/90 px-3.5 py-2 rounded-xl border border-cyber-border self-start sm:self-center shrink-0">
+                            <span class="text-[10px] font-mono text-gray-400 block uppercase">Progreso de Ruta</span>
+                            <span class="text-sm font-mono font-extrabold text-white">${completedInTier} / ${modulesInTier.length} Módulos</span>
+                        </div>
+                    </div>
+                `;
+
+                // Rejilla de Nodos del Árbol de Habilidades
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative';
+
+                modulesInTier.forEach(mod => {
+                    const globalIndex = ROADMAP_MODULES.findIndex(item => item.id === mod.id);
+                    const isDone = appState.completedLessons.includes(mod.id);
+                    const unlocked = isModuleUnlocked(mod, globalIndex);
+
+                    // Determinar si es el siguiente módulo sugerido
+                    const firstUnfinishedIdx = ROADMAP_MODULES.findIndex(m => !appState.completedLessons.includes(m.id));
+                    const isRecommendedNext = globalIndex === firstUnfinishedIdx;
+
+                    const card = document.createElement('div');
+                    let cardStyle = 'bg-cyber-card border-cyber-border hover:border-gray-600';
+                    let badgeStatus = `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-border text-gray-300">Módulo #${mod.order}</span>`;
+
+                    if (isDone) {
+                        cardStyle = 'bg-cyber-card border-cyber-neon/50 shadow-neon-sm';
+                        badgeStatus = `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-neonDim text-cyber-neon border border-cyber-neon/40"><i class="fa-solid fa-check mr-1"></i>Completado</span>`;
+                    } else if (isRecommendedNext) {
+                        cardStyle = 'bg-cyber-card border-cyber-neon node-current';
+                        badgeStatus = `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-neon text-black font-bold">ACTUAL</span>`;
+                    } else if (!unlocked) {
+                        cardStyle = 'bg-cyber-card/50 border-cyber-border opacity-60';
+                        badgeStatus = `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-border text-gray-400"><i class="fa-solid fa-lock mr-1"></i>Bloqueado</span>`;
+                    }
+
+                    card.className = `rounded-2xl border p-5 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 ${cardStyle}`;
+                    card.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="w-11 h-11 rounded-xl ${isDone ? 'bg-cyber-neon text-black' : 'bg-cyber-bg border border-cyber-border text-cyber-neon'} flex items-center justify-center text-xl">
+                                    <i class="${mod.icon}"></i>
+                                </div>
+                                ${badgeStatus}
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-white leading-snug">${mod.title}</h3>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">${mod.subtitle}</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 mt-4 border-t border-cyber-border flex items-center justify-between gap-2">
+                            <span class="text-[11px] font-mono text-gray-400">
+                                <i class="fa-solid fa-list-check text-cyber-purpleLight mr-1"></i>3 Preguntas
+                            </span>
+                            ${
+                                unlocked
+                                    ? `<button onclick="openLessonModal('${mod.id}')" class="px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 ${
+                                        isDone
+                                            ? 'bg-cyber-bg hover:bg-cyber-border text-cyber-neon border border-cyber-neon/40'
+                                            : 'bg-cyber-neon text-black hover:brightness-110 shadow-neon-sm'
+                                    }">
+                                        <i class="fa-solid ${isDone ? 'fa-rotate' : 'fa-play'}"></i>
+                                        ${isDone ? 'Repasar' : 'Estudiar'}
+                                    </button>`
+                                    : `<button onclick="notifyLockedModule()" class="px-3.5 py-2 rounded-xl text-xs font-mono bg-cyber-bg text-gray-500 border border-cyber-border cursor-not-allowed">
+                                        <i class="fa-solid fa-lock mr-1"></i>Bloqueado
+                                    </button>`
+                            }
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                tierSection.appendChild(grid);
+                container.appendChild(tierSection);
+            });
+        }
+
+        function notifyLockedModule() {
+            playCyberSound('error');
+            showToast('Completa el módulo anterior primero o activa el "Acceso Libre" arriba.', 'info');
+        }
+
+        /* ==========================================================
+           7. SISTEMA DE LECCIONES INTERACTIVAS Y EXÁMENES (MODAL)
+           ========================================================== */
+
+        function openLessonModal(moduleId) {
+            playCyberSound('click');
+            const mod = ROADMAP_MODULES.find(m => m.id === moduleId);
+            if (!mod) return;
+
+            currentModule = mod;
+            currentQuizIndex = 0;
+            currentQuizScore = 0;
+            currentQuestionAnswered = false;
+
+            document.getElementById('modal-module-tier').textContent = `${mod.tier} • Módulo #${mod.order}`;
+            document.getElementById('modal-module-title').textContent = mod.title;
+            document.getElementById('modal-module-icon').innerHTML = `<i class="${mod.icon}"></i>`;
+            document.getElementById('modal-theory-text').textContent = mod.theory;
+            document.getElementById('modal-theory-code').textContent = mod.codeSnippet;
+
+            switchLessonModalTab('theory');
+            document.getElementById('lesson-modal').classList.remove('hidden');
+        }
+
+        function closeLessonModal() {
+            playCyberSound('click');
+            document.getElementById('lesson-modal').classList.add('hidden');
+        }
+
+        function switchLessonModalTab(tab) {
+            const tabTheoryBtn = document.getElementById('modal-tab-theory');
+            const tabQuizBtn = document.getElementById('modal-tab-quiz');
+            const theoryView = document.getElementById('lesson-theory-content');
+            const quizView = document.getElementById('lesson-quiz-content');
+            const completedView = document.getElementById('lesson-completed-content');
+
+            completedView.classList.add('hidden');
+
+            if (tab === 'theory') {
+                tabTheoryBtn.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-cyber-neon text-cyber-neon flex items-center gap-2 transition';
+                tabQuizBtn.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition';
+                theoryView.classList.remove('hidden');
+                quizView.classList.add('hidden');
+            } else {
+                tabQuizBtn.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-cyber-neon text-cyber-neon flex items-center gap-2 transition';
+                tabTheoryBtn.className = 'pb-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2 transition';
+                theoryView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                renderCurrentQuizQuestion();
+            }
+        }
+
+        function renderCurrentQuizQuestion() {
+            if (!currentModule) return;
+            const total = currentModule.questions.length;
+            const qObj = currentModule.questions[currentQuizIndex];
+            currentQuestionAnswered = false;
+
+            document.getElementById('quiz-progress-label').textContent = `Pregunta ${currentQuizIndex + 1} de ${total}`;
+
+            // Puntos de progreso
+            const dotsContainer = document.getElementById('quiz-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('span');
+                dot.className = `w-2.5 h-2.5 rounded-full ${
+                    i < currentQuizIndex
+                        ? 'bg-cyber-neon'
+                        : i === currentQuizIndex
+                        ? 'bg-cyber-purpleLight animate-pulse'
+                        : 'bg-cyber-border'
+                }`;
+                dotsContainer.appendChild(dot);
+            }
+
+            document.getElementById('quiz-question-text').textContent = qObj.q;
+
+            // Renderizar opciones de respuesta
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = '';
+
+            qObj.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option-btn w-full text-left p-4 rounded-xl bg-cyber-bg hover:bg-cyber-border/70 border border-cyber-border transition flex items-center justify-between gap-3 group';
+                btn.onclick = () => selectQuizAnswer(idx, btn);
+
+                const letter = String.fromCharCode(65 + idx);
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg bg-cyber-card border border-cyber-border font-mono text-xs font-bold flex items-center justify-center text-gray-300 group-hover:border-cyber-neon group-hover:text-cyber-neon transition">${letter}</span>
+                        <span class="text-sm font-medium text-gray-200">${optText}</span>
+                    </div>
+                    <i class="quiz-option-icon fa-regular fa-circle text-gray-500"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function selectQuizAnswer(selectedIdx, clickedBtn) {
+            if (currentQuestionAnswered) return;
+            currentQuestionAnswered = true;
+
+            const qObj = currentModule.questions[currentQuizIndex];
+            const isCorrect = selectedIdx === qObj.correct;
+            const allBtns = document.querySelectorAll('.quiz-option-btn');
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            const nextBtn = document.getElementById('quiz-next-btn');
+
+            allBtns.forEach((btn, idx) => {
+                btn.disabled = true;
+                const icon = btn.querySelector('.quiz-option-icon');
+                if (idx === qObj.correct) {
+                    btn.className = 'quiz-option-btn w-full text-left p-4 rounded-xl bg-cyber-neonDim border-2 border-cyber-neon flex items-center justify-between gap-3';
+                    icon.className = 'quiz-option-icon fa-solid fa-circle-check text-cyber-neon text-lg';
+                } else if (idx === selectedIdx && !isCorrect) {
+                    btn.className = 'quiz-option-btn w-full text-left p-4 rounded-xl bg-cyber-danger/15 border-2 border-cyber-danger flex items-center justify-between gap-3';
+                    icon.className = 'quiz-option-icon fa-solid fa-circle-xmark text-cyber-danger text-lg';
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                currentQuizScore++;
+                playCyberSound('success');
+                // Otorgar +50 XP y +10 Monedas según la especificación
+                addRewards(50, 10, `Respuesta correcta (${currentModule.title})`);
+
+                feedbackBox.className = 'rounded-xl p-4 border border-cyber-neon/50 bg-cyber-neonDim text-sm space-y-1';
+                feedbackBox.innerHTML = `
+                    <div class="font-extrabold text-cyber-neon flex items-center justify-between">
+                        <span><i class="fa-solid fa-bolt mr-1.5"></i>¡Respuesta Correcta!</span>
+                        <span class="font-mono text-xs">+50 XP | +10 PyCoins</span>
+                    </div>
+                    <p class="text-xs text-gray-200 leading-relaxed">${qObj.explanation}</p>
+                `;
+            } else {
+                playCyberSound('error');
+                feedbackBox.className = 'rounded-xl p-4 border border-cyber-danger/50 bg-cyber-danger/10 text-sm space-y-1';
+                feedbackBox.innerHTML = `
+                    <div class="font-extrabold text-cyber-danger flex items-center gap-1.5">
+                        <i class="fa-solid fa-Graduation-cap"></i> Feedback Educativo:
+                    </div>
+                    <p class="text-xs text-gray-200 leading-relaxed">${qObj.explanation}</p>
+                `;
+            }
+
+            nextBtn.classList.remove('hidden');
+            nextBtn.innerHTML = currentQuizIndex < currentModule.questions.length - 1
+                ? 'Siguiente Pregunta <i class="fa-solid fa-forward-step ml-1"></i>'
+                : 'Ver Resultado Final <i class="fa-solid fa-flag-checkered ml-1"></i>';
+        }
+
+        function nextQuizQuestion() {
+            playCyberSound('click');
+            if (currentQuizIndex < currentModule.questions.length - 1) {
+                currentQuizIndex++;
+                renderCurrentQuizQuestion();
+            } else {
+                finishModuleQuiz();
+            }
+        }
+
+        function finishModuleQuiz() {
+            document.getElementById('lesson-quiz-content').classList.add('hidden');
+            const completedView = document.getElementById('lesson-completed-content');
+            completedView.classList.remove('hidden');
+
+            const total = currentModule.questions.length;
+            document.getElementById('quiz-summary-score').textContent = `${currentQuizScore} / ${total}`;
+
+            if (!appState.completedLessons.includes(currentModule.id)) {
+                appState.completedLessons.push(currentModule.id);
+                checkAndUnlockAchievements();
+                saveState();
+                renderAll();
+            }
+
+            playCyberSound('levelup');
+            document.getElementById('quiz-summary-title').textContent =
+                currentQuizScore === total ? '¡Puntuación Perfecta!' : '¡Módulo Completado!';
+            document.getElementById('quiz-summary-subtitle').textContent =
+                `Has completado "${currentModule.title}". El progreso se ha sincronizado automáticamente en tu perfil universitario.`;
+        }
+
+        function restartCurrentQuiz() {
+            playCyberSound('click');
+            currentQuizIndex = 0;
+            currentQuizScore = 0;
+            switchLessonModalTab('quiz');
+        }
+
+        /* ==========================================================
+           8. RETOS DIARIOS CON CRONÓMETRO Y CONSOLA (HACKFY)
+           ========================================================== */
+
+        function renderDailyChallenges() {
+            const tabsContainer = document.getElementById('daily-challenges-tabs');
+            tabsContainer.innerHTML = '';
+
+            DAILY_CHALLENGES.forEach((ch, idx) => {
+                const isSelected = appState.activeChallengeId === ch.id;
+                const isDone = appState.completedChallenges.includes(ch.id);
+
+                const btn = document.createElement('button');
+                btn.onclick = () => selectDailyChallenge(ch.id);
+                btn.className = `p-4 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 ${
+                    isSelected
+                        ? 'bg-cyber-card border-cyber-neon shadow-neon-sm'
+                        : 'bg-cyber-card/60 border-cyber-border hover:border-gray-600'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center font-mono font-bold text-sm ${
+                            isDone
+                                ? 'bg-cyber-neon text-black'
+                                : isSelected
+                                ? 'bg-cyber-neonDim text-cyber-neon border border-cyber-neon/40'
+                                : 'bg-cyber-bg text-gray-400 border border-cyber-border'
+                        }">
+                            ${isDone ? '<i class="fa-solid fa-check"></i>' : `#${idx + 1}`}
+                        </div>
+                        <div class="truncate">
+                            <span class="text-[10px] font-mono uppercase text-gray-400 block">${ch.difficulty}</span>
+                            <p class="text-sm font-bold text-white truncate">${ch.title}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono shrink-0 ${isDone ? 'text-cyber-neon' : 'text-cyber-amber'}">
+                        ${isDone ? 'RESUELTO' : '+150 XP'}
+                    </span>
+                `;
+                tabsContainer.appendChild(btn);
+            });
+
+            loadActiveChallengeIntoEditor();
+        }
+
+        function selectDailyChallenge(challengeId) {
+            playCyberSound('click');
+            appState.activeChallengeId = challengeId;
+            saveState();
+            renderDailyChallenges();
+        }
+
+        function getActiveChallengeObj() {
+            return DAILY_CHALLENGES.find(c => c.id === appState.activeChallengeId) || DAILY_CHALLENGES[0];
+        }
+
+        function loadActiveChallengeIntoEditor() {
+            const ch = getActiveChallengeObj();
+            const isDone = appState.completedChallenges.includes(ch.id);
+
+            document.getElementById('challenge-difficulty-badge').textContent = `Dificultad: ${ch.difficulty}`;
+            document.getElementById('challenge-status-badge').innerHTML = isDone
+                ? '<span class="text-cyber-neon font-bold"><i class="fa-solid fa-circle-check mr-1"></i>Superado Hoy</span>'
+                : '<span class="text-amber-400"><i class="fa-regular fa-clock mr-1"></i>Pendiente de envío</span>';
+
+            document.getElementById('challenge-title').textContent = ch.title;
+            document.getElementById('challenge-desc').textContent = ch.desc;
+            document.getElementById('challenge-goal').textContent = ch.goal;
+            document.getElementById('editor-filename').textContent = `${ch.filename} — Python 3.12`;
+
+            document.getElementById('challenge-hint-box').classList.add('hidden');
+            document.getElementById('challenge-hint-text').textContent = ch.hint;
+
+            const editor = document.getElementById('challenge-code-editor');
+            editor.value = isDone ? ch.solutionCode : ch.starterCode;
+            updateLineNumbers();
+        }
+
+        function updateLineNumbers() {
+            const editor = document.getElementById('challenge-code-editor');
+            const lineNumbersEl = document.getElementById('editor-line-numbers');
+            const linesCount = Math.max(5, editor.value.split('\n').length);
+            const nums = [];
+            for (let i = 1; i <= linesCount; i++) {
+                nums.push(i);
+            }
+            lineNumbersEl.innerHTML = nums.join('<br>');
+        }
+
+        function handleEditorTab(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const editor = e.target;
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+                editor.selectionStart = editor.selectionEnd = start + 4;
+                updateLineNumbers();
+            }
+        }
+
+        function resetChallengeCode() {
+            playCyberSound('click');
+            const ch = getActiveChallengeObj();
+            document.getElementById('challenge-code-editor').value = ch.starterCode;
+            updateLineNumbers();
+            showToast('Código restaurado al estado inicial.', 'info');
+        }
+
+        function showChallengeHint() {
+            playCyberSound('click');
+            const hintBox = document.getElementById('challenge-hint-box');
+            hintBox.classList.remove('hidden');
+        }
+
+        function fillChallengeSolution() {
+            playCyberSound('click');
+            const ch = getActiveChallengeObj();
+            document.getElementById('challenge-code-editor').value = ch.solutionCode;
+            updateLineNumbers();
+            showToast('Solución cargada en el editor. Pulsa "Enviar Solución" para compilar.', 'info');
+        }
+
+        function submitDailyChallenge() {
+            const ch = getActiveChallengeObj();
+            const userCode = document.getElementById('challenge-code-editor').value;
+            const terminal = document.getElementById('terminal-output');
+            const statusBadge = document.getElementById('terminal-status-indicator');
+            const submitBtn = document.getElementById('submit-challenge-btn');
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-60');
+            statusBadge.textContent = 'COMPILING...';
+            statusBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-cyber-purpleDim text-cyber-purpleLight animate-pulse';
+
+            terminal.innerHTML = `
+                <p class="text-gray-400">$ python3 -m pytest ${ch.filename} --verbose</p>
+                <p class="text-cyber-purpleLight"><i class="fa-solid fa-gear fa-spin mr-1.5"></i>Inicializando contenedor aislado Python 3.12...</p>
+            `;
+
+            setTimeout(() => {
+                terminal.innerHTML += `<p class="text-gray-300">> Analizando árbol sintáctico (AST) y ejecutando casos de prueba...</p>`;
+            }, 450);
+
+            setTimeout(() => {
+                const passed = ch.validate(userCode);
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60');
+
+                if (passed) {
+                    playCyberSound('success');
+                    statusBadge.textContent = 'TEST PASS';
+                    statusBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-cyber-neonDim text-cyber-neon font-bold';
+
+                    terminal.innerHTML += `
+                        <p class="text-cyber-neon font-bold">✓ [PASS] Test Case #1: Entrada estándar verificada (0.01s)</p>
+                        <p class="text-cyber-neon font-bold">✓ [PASS] Test Case #2: Casos borde superados (0.02s)</p>
+                        <p class="text-white bg-cyber-neon/20 border border-cyber-neon/40 p-2 rounded mt-1">
+                            🎉 ¡Test Pass exitoso! Todos los controles de calidad fueron aprobados.
+                        </p>
+                    `;
+
+                    if (!appState.completedChallenges.includes(ch.id)) {
+                        appState.completedChallenges.push(ch.id);
+                    }
+                    addRewards(150, 35, `Reto Diario Superado (${ch.title})`);
+                    renderDailyChallenges();
+                } else {
+                    playCyberSound('error');
+                    statusBadge.textContent = 'FAILED';
+                    statusBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-cyber-danger/20 text-cyber-danger font-bold';
+
+                    terminal.innerHTML += `
+                        <p class="text-cyber-danger font-bold">✗ [AssertionError] La salida de la función no cumple con el criterio de aceptación.</p>
+                        <p class="text-amber-300">💡 Consejo: Usa el botón "Ver Pista" o "Auto-completar Solución" si necesitas ayuda con la sintaxis exacta.</p>
+                    `;
+                }
+            }, 1100);
+        }
+
+        // Cronómetro de Cuenta Regresiva del Reto Diario
+        let countdownSecondsRemaining = (8 * 3600) + (42 * 60) + 19;
+
+        function startDailyCountdown() {
+            const el = document.getElementById('daily-countdown');
+            setInterval(() => {
+                if (countdownSecondsRemaining <= 0) {
+                    countdownSecondsRemaining = 24 * 3600;
+                } else {
+                    countdownSecondsRemaining--;
+                }
+                const hrs = String(Math.floor(countdownSecondsRemaining / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((countdownSecondsRemaining % 3600) / 60)).padStart(2, '0');
+                const secs = String(countdownSecondsRemaining % 60).padStart(2, '0');
+                if (el) el.textContent = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        /* ==========================================================
+           9. LIGA UNIVERSITARIA (RANKING DINÁMICO)
+           ========================================================== */
+
+        function saveStudentAlias() {
+            const input = document.getElementById('student-alias-input');
+            const cleanName = (input.value || '').trim().slice(0, 18) || 'CyberStudent_PY';
+            appState.username = cleanName;
+            input.value = cleanName;
+            saveState();
+            renderLeaderboard();
+            renderAchievementsAndProfile();
+            playCyberSound('success');
+            showToast(`Alias actualizado a @${cleanName}`, 'info');
+        }
+
+        function renderLeaderboard() {
+            const aliasInput = document.getElementById('student-alias-input');
+            if (aliasInput && document.activeElement !== aliasInput) {
+                aliasInput.value = appState.username;
+            }
+
+            // Combinar competidores ficticios con el usuario real y ordenar por XP descendente
+            const allPlayers = [
+                ...COMPETITORS_BASE.map(c => ({ ...c, isUser: false })),
+                {
+                    id: 'real_user',
+                    name: appState.username,
+                    avatar: 'fa-user-ninja',
+                    xp: appState.xp,
+                    color: 'text-cyber-neon',
+                    isUser: true
+                }
+            ].sort((a, b) => b.xp - a.xp);
+
+            // Renderizar Podio Top 3
+            const podiumContainer = document.getElementById('leaderboard-podium');
+            podiumContainer.innerHTML = '';
+
+            allPlayers.slice(0, 3).forEach((player, idx) => {
+                const rankObj = getRankForXP(player.xp);
+                const medals = [
+                    { label: '1° LUGAR • ORO', border: 'border-cyber-amber', badgeBg: 'bg-cyber-amber text-black', trophy: 'text-cyber-amber' },
+                    { label: '2° LUGAR • PLATA', border: 'border-gray-400', badgeBg: 'bg-gray-300 text-black', trophy: 'text-gray-300' },
+                    { label: '3° LUGAR • BRONCE', border: 'border-amber-700', badgeBg: 'bg-amber-700 text-white', trophy: 'text-amber-600' }
+                ][idx];
+
+                const card = document.createElement('div');
+                card.className = `rounded-2xl bg-cyber-card border-2 ${ player.isUser ? 'border-cyber-neon shadow-neon-sm' : medals.border } p-5 flex items-center justify-between gap-4`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-cyber-bg border border-cyber-border flex items-center justify-center text-xl ${player.color}">
+                            <i class="fa-solid ${player.avatar}"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded ${medals.badgeBg}">${medals.label}</span>
+                            <h4 class="text-base font-black text-white mt-1 flex items-center gap-1.5">
+                                ${player.name}
+                                ${player.isUser ? '<span class="text-[10px] font-mono bg-cyber-neonDim text-cyber-neon px-1.5 py-0.5 rounded border border-cyber-neon/40">TÚ</span>' : ''}
+                            </h4>
+                            <p class="text-xs font-mono text-gray-400">${rankObj.title}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <i class="fa-solid fa-trophy ${medals.trophy} text-lg"></i>
+                        <span class="block font-mono font-black text-lg text-white">${player.xp} <span class="text-xs text-cyber-neon">XP</span></span>
+                    </div>
+                `;
+                podiumContainer.appendChild(card);
+            });
+
+            // Renderizar tabla completa
+            const rowsContainer = document.getElementById('leaderboard-rows');
+            rowsContainer.innerHTML = '';
+
+            allPlayers.forEach((player, idx) => {
+                const rankObj = getRankForXP(player.xp);
+                const row = document.createElement('div');
+                row.className = `px-5 py-4 flex items-center justify-between gap-3 transition ${
+                    player.isUser
+                        ? 'bg-cyber-neonDim/60 border-l-4 border-l-cyber-neon'
+                        : 'hover:bg-cyber-bg/60'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <span class="w-7 font-mono font-black text-sm ${idx < 3 ? 'text-cyber-amber' : 'text-gray-400'}">#${idx + 1}</span>
+                        <div class="w-10 h-10 rounded-xl bg-cyber-bg border border-cyber-border flex items-center justify-center ${player.color} shrink-0">
+                            <i class="fa-solid ${player.avatar}"></i>
+                        </div>
+                        <div class="truncate">
+                            <p class="text-sm font-bold text-white truncate flex items-center gap-2">
+                                ${player.name}
+                                ${player.isUser ? '<span class="text-[10px] font-mono bg-cyber-neon text-black font-extrabold px-1.5 py-0.5 rounded">TÚ</span>' : ''}
+                            </p>
+                            <span class="text-xs font-mono text-gray-400">${rankObj.title} • Nivel ${rankObj.level}</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="font-mono font-extrabold text-sm sm:text-base ${player.isUser ? 'text-cyber-neon' : 'text-white'}">${player.xp} XP</span>
+                    </div>
+                `;
+                rowsContainer.appendChild(row);
+            });
+        }
+
+        /* ==========================================================
+           10. LOGROS, PERFIL Y ESCALAFÓN UNIVERSITARIO
+           ========================================================== */
+
+        function renderAchievementsAndProfile() {
+            const currentRank = getRankForXP(appState.xp);
+
+            document.getElementById('profile-rank-badge').textContent = `${currentRank.title} • Nivel ${currentRank.level}`;
+            document.getElementById('profile-username').textContent = appState.username;
+            document.getElementById('profile-stat-xp').textContent = `${appState.xp} XP`;
+            document.getElementById('profile-stat-coins').textContent = `${appState.coins} PyCoins`;
+            document.getElementById('profile-stat-lessons').textContent = `${appState.completedLessons.length} / ${ROADMAP_MODULES.length}`;
+            document.getElementById('profile-stat-badges').textContent = `${appState.unlockedAchievements.length} / ${ACHIEVEMENTS_LIST.length}`;
+
+            // Renderizar Escalafón de Rangos Universitarios
+            const ranksListEl = document.getElementById('ranks-progression-list');
+            ranksListEl.innerHTML = '';
+
+            UNIVERSITY_RANKS.forEach(r => {
+                const isCurrent = r.id === currentRank.id;
+                const isReached = appState.xp >= r.minXP;
+
+                const item = document.createElement('div');
+                item.className = `p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
+                    isCurrent
+                        ? 'bg-cyber-neonDim border-cyber-neon shadow-neon-sm'
+                        : isReached
+                        ? 'bg-cyber-bg/90 border-cyber-purple/50'
+                        : 'bg-cyber-bg/40 border-cyber-border opacity-60'
+                }`;
+
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-base ${
+                            isCurrent
+                                ? 'bg-cyber-neon text-black'
+                                : isReached
+                                ? 'bg-cyber-purpleDim text-cyber-purpleLight'
+                                : 'bg-cyber-card text-gray-500'
+                        }">
+                            <i class="fa-solid ${r.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-extrabold text-white">${r.title}</span>
+                                ${isCurrent ? '<span class="text-[10px] font-mono bg-cyber-neon text-black font-bold px-1.5 py-0.2 rounded">ACTUAL</span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-400">${r.desc}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono font-bold shrink-0 ${isReached ? 'text-cyber-neon' : 'text-gray-400'}">
+                        ${r.minXP} XP
+                    </span>
+                `;
+                ranksListEl.appendChild(item);
+            });
+
+            // Renderizar Rejilla de Medallas (Logros)
+            const grid = document.getElementById('achievements-grid');
+            grid.innerHTML = '';
+
+            ACHIEVEMENTS_LIST.forEach(ach => {
+                const unlocked = appState.unlockedAchievements.includes(ach.id);
+                const card = document.createElement('div');
+                card.className = `rounded-2xl border p-5 flex flex-col justify-between gap-4 transition ${
+                    unlocked
+                        ? 'bg-cyber-card border-cyber-neon/60 shadow-neon-sm'
+                        : 'bg-cyber-card/40 border-cyber-border opacity-60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${
+                                unlocked
+                                    ? 'bg-gradient-to-br from-cyber-neon to-cyber-purple text-black shadow-neon-sm'
+                                    : 'bg-cyber-bg border border-cyber-border text-gray-500'
+                            }">
+                                <i class="${ach.icon}"></i>
+                            </div>
+                            <span class="text-[10px] font-mono px-2.5 py-1 rounded-full ${
+                                unlocked
+                                    ? 'bg-cyber-neonDim text-cyber-neon border border-cyber-neon/40 font-bold'
+                                    : 'bg-cyber-border text-gray-400'
+                            }">
+                                ${unlocked ? 'DESBLOQUEADO' : 'BLOQUEADO'}
+                            </span>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-extrabold text-white">${ach.title}</h4>
+                            <p class="text-xs text-gray-400 mt-1 leading-relaxed">${ach.desc}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function grantDemoBoost() {
+            playCyberSound('success');
+            addRewards(100, 25, 'Impulso de Demostración');
+        }
+
+        /* ==========================================================
+           11. MODAL DE REINICIO E INICIALIZACIÓN DE LA PLATAFORMA
+           ========================================================== */
+
+        function openResetModal() {
+            playCyberSound('click');
+            document.getElementById('reset-modal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            playCyberSound('click');
+            document.getElementById('reset-modal').classList.add('hidden');
+        }
+
+        function confirmResetProgress() {
+            localStorage.removeItem(STORAGE_KEY);
+            appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            saveState();
+            closeResetModal();
+            renderAll();
+            switchView('roadmap');
+            playCyberSound('levelup');
+            showToast('Progreso reiniciado a los valores de fábrica.', 'info');
+        }
+
+        function renderAll() {
+            checkAndUnlockAchievements();
+            renderHeaderAndSidebar();
+            renderRoadmap();
+            renderDailyChallenges();
+            renderLeaderboard();
+            renderAchievementsAndProfile();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+            switchView(appState.activeView || 'roadmap');
+            startDailyCountdown();
+        });
+    </script>
+</body>
+</html>
